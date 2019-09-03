@@ -65,4 +65,4 @@ install:
 script: 
  - cd ./lab1
  - gcc -fopenmp –o ompsum2 ompsum2.c
- - ./ompsum
+ - ./ompsum2
