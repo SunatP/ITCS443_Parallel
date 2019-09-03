@@ -67,3 +67,5 @@ script:
  - gcc -fopenmp -o ompsum2 ompsum2.c
 #- gcc main.c -o main -pthread
  - ./ompsum2
+ - gcc -fopenmp -o helloomp helloomp.c
+ - ./helloomp
