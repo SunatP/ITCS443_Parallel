@@ -63,6 +63,7 @@ install:
 
 
 script: 
- - cd ./lab1/
+ - cd ./Lab1/
  - gcc -fopenmp=libiomp5 -o ompsum2 ompsum2.c
+#- gcc main.c -o main -pthread
  - ./ompsum2
