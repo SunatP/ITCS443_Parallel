@@ -1,3 +1,6 @@
+/* TODO 1 Master process asks for 2 user inputs: left and right  */
+/* TODO 2 Master process broadcasts left and right to all slaves */ 
+/* TODO 3 Replace MPI_Send/MPI_Recv with MPI_Reduce operation to combine partial results into the final result */
 #define LEFT 1 
 #define RIGHT 1000 
 #include <stdio.h> 
