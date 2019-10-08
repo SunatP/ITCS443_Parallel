@@ -51,3 +51,31 @@ int main()
 ```c
 Write an OpenMP program to find the summation of values in A[] using reduction clause (+operator). Verify your output with the sequential version.
 ```
+เราจะต้องใช้ reduction clause เพื่อลดรูปเครื่องหมายสมการ
+
+```c
+#include <omp.h> 
+  
+#include <stdio.h> 
+#include <stdlib.h> 
+  
+int main(int argc, char* argv[]) 
+{ 
+  int a[100],sum;
+  srand(1234);
+    // Beginning of parallel region 
+    #pragma omp parallel for // pragma สำหรับ for สำหรับการรัน for loop 
+        for (int i = 0; i < 100; i++)
+        {
+            a[i] = rand() %1000;
+            // a[i] = i;
+            /* code */
+            sum += a[i]; // Reduction clause instead 
+        }
+        printf("%d\n",sum);
+    return 0;
+    // Ending of parallel region 
+} 
+```
+
+ตรง sum += a[i] คือการลดรูปจาก sum = sum + a[i] หรือที่เรียกว่า Reduction Clause 
