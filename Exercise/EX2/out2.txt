@@ -1,0 +1,4 @@
+processor 0 sent 2
+processor 0 got 4
+processor 1 got 2
+processor 1 sent 4
