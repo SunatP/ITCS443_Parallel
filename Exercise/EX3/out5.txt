@@ -1,0 +1,1 @@
+Input 1-1000 Total number that less than 15 is 37

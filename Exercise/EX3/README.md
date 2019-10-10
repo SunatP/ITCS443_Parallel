@@ -76,6 +76,8 @@ MPI_Bcast(
 
 ### ข้อ 1. จริงๆแล้วนะ.
 
+เริ่มเขียนโค้ด
+
 ```C
 #include "mpi.h"
 #include <stdio.h>
@@ -87,7 +89,7 @@ int main(int argc,char *argv[]) {
     int min[size],max[size],sum[size],avg=0;
     int A[total_size];
     int rank, numprocs;
-    MPI_Init(&argc,&argv);
+    MPI_Init(&argc,&argv); 
     MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
     MPI_Comm_rank(MPI_COMM_WORLD,&rank);
     if(rank == 0)
@@ -98,10 +100,14 @@ int main(int argc,char *argv[]) {
             A[i] = rand()%1000;
         }
     }
-    MPI_Scatter(A,size,MPI_INT,&reciver,size,MPI_INT,0,MPI_COMM_WORLD); // กระจาย value ไปให้แต่ละฟังก์ชัน
-    MPI_Reduce ( &reciver, &min, size, MPI_INT,MPI_MIN, 0,MPI_COMM_WORLD ); // ใช้ Reduce() หาค่าน้อยที่สุดจาก reciver
-    MPI_Reduce ( &reciver, &max, size, MPI_INT,MPI_MAX, 0,MPI_COMM_WORLD ); // ใช้ Reduce() หาค่ามากที่สุดจาก reciver
-    MPI_Reduce ( &reciver, &sum, size, MPI_INT,MPI_SUM, 0,MPI_COMM_WORLD ); // ใช้ Reduce() หาผลรวมจาก reciver
+    MPI_Scatter(A,size,MPI_INT,&reciver,size,MPI_INT,0,MPI_COMM_WORLD); 
+    // กระจาย value ไปให้แต่ละโปรเซส
+    MPI_Reduce ( &reciver, &min, size, MPI_INT,MPI_MIN, 0,MPI_COMM_WORLD ); 
+    // ใช้ Reduce() หาค่าน้อยที่สุดจาก reciver
+    MPI_Reduce ( &reciver, &max, size, MPI_INT,MPI_MAX, 0,MPI_COMM_WORLD ); 
+    // ใช้ Reduce() หาค่ามากที่สุดจาก reciver
+    MPI_Reduce ( &reciver, &sum, size, MPI_INT,MPI_SUM, 0,MPI_COMM_WORLD ); 
+    // ใช้ Reduce() หาผลรวมจาก reciver
     if(rank==0)
     {
         printf("Local maximum: ");
@@ -136,4 +142,68 @@ int main(int argc,char *argv[]) {
     MPI_Finalize();
 }
 
+```
+
+### ข้อ 2. Parallel Search
+
+    - Create an array of random integers in Process 0 
+    - สร้างอาเรย์ที่สุ่มค่าได้ในโปรเซสที่ 0
+    - Distribute distinct part of the array to all process
+    - ส่งค่ออาเรย์ที่ได้ให้กับอาเรย์ในทุกโปรเซส
+    - Process 0 receives an input integer i from a user, and broadcasts it to all
+    - โปรเซส 0 รับค่าจากผู้ใช้ (ค่า i) และส่งค่าโดยใช้ MPI_Bcast ให้ทุกโปรเซส
+    - Count (in parallel) the number of elements in the array that is less than the input integer i. Use MPI_Reduce to complete this step
+    - นับค่าทั้งหมดที่เจอ (Sum) ในอาเรย์โดยมีเงื่อนไขว่าค่าที่เอามานับนั้นน้อยกว่าค่า i. ใช้ฟังก์ชั่น MPI_Reduce
+    - Display the result
+    - แสดงค่าที่ได้
+
+เริ่มเขียนโค้ด
+
+```c
+#include "mpi.h"
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+
+int main(int argc,char *argv[]) {
+    int total_size = 100, size = 25;
+    int i=0,A[total_size],reciver[size],input=-1;
+    int count=0;
+    int abc; // define as global variable in every node
+    int id,numprocs;
+    int chunk_size;
+    MPI_Init(&argc,&argv);
+    MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD,&id);
+    chunk_size = 100/ numprocs; // create chunk size for separate value to each node
+    // สร้าง chunk size มาเพื่อแบ่งค่าลงไปในแต่ละ node
+    if(id ==0) // rank 0 หรือเรียกว่า node 0
+    { 
+        srand(100);
+        for (i=0; i < total_size; i++)
+        {
+            A[i] = rand()%1000; // Random values in Process 0 (Rank 0)
+        }
+        printf("Input 1-1000 ");
+        fflush(stdout);
+        scanf("%d", &input);
+    }
+    MPI_Bcast(&input, 1, MPI_INT, 0, MPI_COMM_WORLD); // Process 0 must Bcast to all process
+    MPI_Scatter(A,total_size/numprocs,MPI_INT,&reciver,chunk_size,MPI_INT,0,MPI_COMM_WORLD); // Use Scatter for separate processes to all process
+
+    for(i=0;i<total_size/numprocs;i++) // use for loop for increment value
+    {
+        if(A[i]<input) count++; // increment value's count 
+    }
+    // After calculate complete
+    MPI_Reduce(&count,&abc,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD); // use reduce to calculate sum value
+        /**
+         * send,receive,send as 1 time, int type, using sum, root as 0
+         * **/ 
+   if (id == 0)
+   {
+       printf("Total number that less than %d is %d\n",input,abc);
+   }
+    MPI_Finalize();
+}
 ```
