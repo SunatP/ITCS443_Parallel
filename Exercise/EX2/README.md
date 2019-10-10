@@ -1,6 +1,6 @@
 # Exercise 2 : MPI Basics
 
-MPI ย่อมาจาก Message Passing Interface เป็นไลบราลีมาตรฐานสำหรับเขียนโปรแกรมแบบ message passing บนแพลตฟอร์มประสิทธิภาพสูง(HPC)  เช่น เครื่อง ซุปเปอร์คอมพิวเตอร์  ระบบคลัสเตอร์ หรือกริด เป็นต้น
+MPI ย่อมาจาก Message Passing Interface เป็นไลบราลีมาตรฐานสำหรับเขียนโปรแกรมแบบ message passing บนแพลตฟอร์มประสิทธิภาพสูง(HPC) เช่น เครื่อง ซุปเปอร์คอมพิวเตอร์  ระบบคลัสเตอร์ หรือกริด เป็นต้น
 
 วิธีคอมไพล์ MPI
 
@@ -54,9 +54,9 @@ Write an MPI program with two processes working as follows:
     - Process 1 calculates the square of the number, and sends the result to process 0
     - Process 0 prints out result
 
-โจทย์ต้องการให้โปรเซส 0 ส่งค่าไปให้โปรเซส 1 แล้วให้โปรเซส 1 นั้นไปคิดค่ายกกำลังแล้วส่งคำตอบกลับมาที่โปรเซส 0 และโปรเซส 0 จะแสดงผลลัพธ์ออกมา
+โจทย์ต้องการให้โปรเซส 0 ส่งค่าไปให้โปรเซส 1 แล้วให้โปรเซส 1 นั้นไปคิดค่ายกกำลังแล้วส่งคำตอบกลับมาที่โปรเซส 0 และให้โปรเซส 0 จะแสดงผลลัพธ์ออกมา
 
-```C++
+```C
 #include <stdio.h>
 #include <mpi.h>
 #include <math.h>
@@ -89,4 +89,124 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+```
+
+### ข้อ 3.
+
+Write an MPI program with two processes working as follows:<br>
+
+    - Process 0 sends an array of 10 integers to process 1
+    - Process 1 multiplies 10 to each element in an the array, and sends the result array back to process
+    - Process 0 prints out result
+
+โจทย์ต้องการให้โปรเซส 0 ส่งค่าไปให้โปรเซส 1 แล้วให้โปรเซส 1 นั้นไปคูณค่าในอาเรย์แต่ละตัวด้วย 10 แล้วส่งคำตอบกลับมาที่โปรเซส 0 และให้โปรเซส 0 จะแสดงผลลัพธ์ออกมา
+
+```C
+#include <stdio.h>
+#include <mpi.h>
+#include <math.h>
+
+int main(int argc, char *argv[]) {
+    int rank, size;
+    int msgtag;
+    int x[10], i, mul[10]; // ประกาศขนาดอาเรย์ทั้งสองตัวไว้ว่าสามารถจุค่าได้ 10 ตัว
+    MPI_Status status;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if (rank == 0) {
+        for (i = 0; i < 10; i++) // สร้าง for loop เพื่อมารับค่าลงอาเรย์ทั้งหมด 10 ตัว
+        {
+            printf("Enter the number %d:  \n", i + 1);
+            fflush(stdout);
+            scanf("%d", &x[i]);
+        }
+        MPI_Send(x, 10, MPI_INT, 1, 1234, MPI_COMM_WORLD); // ส่งค่าไป rank 1
+        MPI_Recv(mul, 10, MPI_INT, 1, 1234, MPI_COMM_WORLD, &status); // รับค่าจาก rank 1
+        for (i = 0; i < 10; i++)
+        {
+            printf("processor %d got %d\n", rank, mul[i]); // แสดงผลลัพธ์จากการส่งข้อมูลจาก rank 1 ไปยัง rank 0
+        }
+    }
+    if (rank == 1) {
+        MPI_Recv(x, 10, MPI_INT, 0, 1234, MPI_COMM_WORLD, &status); // รับค่าจาก rank 0
+        for (i = 0; i < 10; i++) 
+        {
+            mul[i] = x[i] * 10; // เอาค่าจาก rank 0 มาคูณด้วย 10
+        }
+        MPI_Send(mul, 10, MPI_INT, 0, 1234, MPI_COMM_WORLD); // ส่งค่ากลับไปหา rank 0
+    }
+
+    MPI_Finalize(); // จบการทำงานของ MPI
+
+    return 0;
+}
+```
+
+
+### ข้อ 4.
+
+Create MPI program with 1 master and 8 slave processes.<br>
+The master process initializes an 8x8 matrix A,which eaxh element A[i][j] = i + j.<br> Then, the master sends a distinct row of matrix A to each slave.<br> Each slave calculates the summation of all elements in row it has received from the master.<br> Finally, all slaves send back the results to the master for aggregation into the total summation.<br>
+
+โจทย์ให้เราสร้าง MPI ทั้งหมด 9 โปรเซส ประกอบด้วย ตัวหลัก 1 ตัว และลูกย่อยอีก 8 ตัว. โดยตัว Master จะทำการสร้างเมทริกซ์ หรือ อาเรย์สองมิติ. โดยตัว Master จะทำการส่งค่าแต่ละแถวไปให้ slave. และ slave แต่ละตัวจะทำการบวกค่าทั้งหมดในแถวที่ได้รับจาก Master จากนั้น Slave จะทำการส่งค่ากลับไปให้ Master เพื่อแสดงคำตอบที่ได้ทั้งหมด
+
+```C
+#include <stdio.h>
+#include <mpi.h>
+
+int main(int argc, char *argv[]) {
+    int totalSize = 8; // Declare slave value as 8
+    int mpiCommSize;
+    int rank; 
+    int i, j;
+
+    MPI_Status status;
+    int data[totalSize][totalSize];
+    int receive[totalSize];
+
+    int COMM_TAG = 1234;
+
+    int localSum, total = 0;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &mpiCommSize);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    if (rank == 0) 
+    {
+        for (i = 0; i < totalSize; i++) // use for loop to increment value from 0 to 8 (7 elements)
+        {
+            for (j = 0; j < totalSize; j++) 
+            {
+                data[i][j] = i + j;
+            }
+        }
+
+        for (i = 1; i <= totalSize; i++) // use for loop to send and receive value to each slave
+        {
+            MPI_Send(&data[i - 1], totalSize, MPI_INT, i, COMM_TAG, MPI_COMM_WORLD);
+            MPI_Recv(&localSum, 1, MPI_INT, i, COMM_TAG, MPI_COMM_WORLD, &status);
+            total += localSum;
+        }
+        printf("%d\n", total);
+
+    } 
+    else 
+    {
+        localSum = 0;
+        MPI_Recv(&receive, totalSize, MPI_INT, 0, COMM_TAG, MPI_COMM_WORLD, &status); // Receive value from each slave
+        for (i = 0; i < totalSize; i++) // using for loop to calculate total value from each value
+        {
+            localSum += receive[i];
+        }
+        MPI_Send(&localSum, 1, MPI_INT, 0, COMM_TAG, MPI_COMM_WORLD); // send value to each slave
+    }
+    MPI_Finalize(); // End MPI process
+}
+```
+
+
+วิธีรันโจทย์ข้อนี้
+
+```bash
+mpirun -np 9 ./exercise3 # 9 คือโปรเซสทั้งหมด (Master 1 ตัว และ Slave อีก 8 ตัว)
 ```
