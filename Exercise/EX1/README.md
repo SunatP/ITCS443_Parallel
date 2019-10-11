@@ -28,10 +28,10 @@ Pragma เป็นชุดคำสั่งชนิดหนึ่งสา�
 นี่คือโจทย์ที่เราจะต้องแก้ให้ตรงตามเงื่อนไขของอาจารย์
 
 ### ข้อ 1.
-```c
+
 Given an integer array A[100], write an OpenMP program that multiples 10 to each 
-element of the array. Verify your output with the sequential version.
-```
+element of the array.<br> Verify your output with the sequential version.
+
 เราจะต้องใช้ OpenMP เข้ามาเพื่อคูณค่าแต่ละตัวลงอาเรย์
 
 ```c
@@ -75,9 +75,8 @@ gcc -o openmp5 -fopenmp openmp5.c
 
 ### ข้อ 2.
 
-```c
-Write an OpenMP program to find the summation of values in A[] using reduction clause (+operator). Verify your output with the sequential version.
-```
+Write an OpenMP program to find the summation of values in A[] using reduction clause (+operator).<br> Verify your output with the sequential version.
+
 เราจะต้องใช้ reduction clause เพื่อลดรูปเครื่องหมายสมการ
 
 ```c
