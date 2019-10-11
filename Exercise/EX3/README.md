@@ -189,7 +189,8 @@ int main(int argc,char *argv[]) {
         scanf("%d", &input);
     }
     MPI_Bcast(&input, 1, MPI_INT, 0, MPI_COMM_WORLD); // Process 0 must Bcast to all process
-    MPI_Scatter(A,total_size/numprocs,MPI_INT,&reciver,chunk_size,MPI_INT,0,MPI_COMM_WORLD); // Use Scatter for separate processes to all process
+    MPI_Scatter(A,total_size/numprocs,MPI_INT,&reciver,chunk_size,MPI_INT,0,MPI_COMM_WORLD); 
+    // Use Scatter for separate processes to all process
 
     for(i=0;i<total_size/numprocs;i++) // use for loop for increment value
     {
