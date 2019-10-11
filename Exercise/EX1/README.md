@@ -108,9 +108,9 @@ int main(int argc, char* argv[])
 
 ### ข้อ 3.
 
-```c
-Write an OpenMP program to find the maximum values in an integer array using reduction clause (max operator). Verify your output with the sequential version.
-```
+
+Write an OpenMP program to find the maximum values in an integer array using reduction clause (max operator).<br> Verify your output with the sequential version.
+
 เราจะต้องสร้าง int max ขึ้นมา 1 ตัว แล้วสร้าง if condition เพื่อหาค่าที่สูงที่สุดใน array นั้นๆ
 
 ```c
@@ -142,9 +142,9 @@ int main(int argc, char* argv[])
 
 ### ข้อ 4.
 
-```c
-Write an OpenMP program to find the number of integer greater or equal to 500. Verify your output with the sequential version.
-```
+
+Write an OpenMP program to find the number of integer greater or equal to 500.<br> Verify your output with the sequential version.
+
 
 ```c
 #include <omp.h> 
@@ -173,10 +173,10 @@ int main(int argc, char* argv[])
 
 ### ข้อ 5.
 
-```c
-Rewrite question 2 (find summation) by not using reduction clause.
+
+Rewrite question 2 (find summation) by not using reduction clause.<br>
 Use private variable (psum) and shared variable (sum) with critical section.
-```
+
 เราจะต้องเอาข้อ 2. มาแก้ใหม่โดยไม่ใช้การลดรูปเครื่องหมายสมการ แต่ให้ใช้ตัวแปรแบบ private และ shared พร้อมทั้งใช้ Critical 
 
 ```c
