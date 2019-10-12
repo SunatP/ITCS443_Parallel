@@ -34,7 +34,7 @@ int main()
  * Check the result with the sequential version executed at Process 0 เช็คคำตอบที่โปรเซส 0
  * Hint: Use separate MPI_Reduce for global maximum, minimum and average values
 
-## อะไรคือ MPI_Scatter, MPI_Reduce MPI_Bcast
+## อะไรคือ MPI_Scatter, MPI_Bcast,MPI_Reduce, MPI_Gather
 
 MPI_Scatter คือฟังก์ชันที่ทำงานโดยการกระจายข้อมูลจากโปรเซส root ไปยังโปรเซสทั้งหมด แต่ไม่เหมือนกับ MPI_Bcast ตรงที่ MPI_Bcast จะส่งข้อมูลทั้งหมดไปให้กับทุกโปรเซส แต่ MPI_Scatter จะแบ่งข้อมูลเป็นส่วนๆ และส่งแต่จะส่วนให้กับแต่ละโปรเซส
 
@@ -50,6 +50,18 @@ MPI_Scatter(
     MPI_Comm comm)        // ตัว communicator
 ```
 
+MPI_Bcast คือฟังก์ชันสำหรับกระจายข้อมูลจากโปรเซสหนึ่งไปยังโปรเซสที่เหลือทั้งหมด 
+
+![Bcast](https://mpitutorial.com/tutorials/mpi-scatter-gather-and-allgather/broadcastvsscatter.png)
+```C
+MPI_Bcast(
+    vorank* data,             // &ตัวส่ง data
+    int count,              // จำนวนข้อฒูลที่จะส่ง
+    MPI_Datatype datatype,  // ชนิดข้อมูล
+    int root,               // rank เริ่มต้น
+    MPI_Comm communicator)  // ตัว communicator
+```
+
 MPI_Reduce คือฟังก์ชันสำหรับรวมข้อมูลของทุกโปรเซสมายังโปรเซส root
 
 ```C
@@ -63,16 +75,23 @@ MPI_Reduce(
     MPI_Comm communicator)  // ตัว communicator
 ```
 
-MPI_Bcast คือฟังก์ชันสำหรับกระจายข้อมูลจากโปรเซสหนึ่งไปยังโปรเซสที่เหลือทั้งหมด
+MPI_Gather คือฟังก์ชั่นตรงกันข้ามกับ Scatter โดยฟังก์ชันนี้จะรวมงานแต่ละโปรเซสเข้ามารวมเป็นอันเดียว
+
+![Gather](https://mpitutorial.com/tutorials/mpi-scatter-gather-and-allgather/gather.png)
 
 ```C
-MPI_Bcast(
-    vorank* data,             // &ตัวส่ง data
-    int count,              // จำนวนข้อฒูลที่จะส่ง
-    MPI_Datatype datatype,  // ชนิดข้อมูล
-    int root,               // rank เริ่มต้น
+MPI_Gather(
+    void* send_data,  // &ตัวส่ง data
+    int send_count,   // จำนวนข้อมูลที่จะส่ง
+    MPI_Datatype send_datatype, // ชนิดข้อมูล
+    void* recv_data, // &ตัวรับ data
+    int recv_count, // รับ data เป็นจำนวนเท่าไหร่
+    MPI_Datatype recv_datatype, // รับ data เป็นชนิดไหน
+    int root,       // rank เริ่มต้นที่ส่งโปรเซส
     MPI_Comm communicator)  // ตัว communicator
+
 ```
+
 
 ### ข้อ 1. จริงๆแล้วนะ.
 
@@ -101,7 +120,7 @@ int main(int argc,char *argv[]) {
         }
     }
     MPI_Scatter(A,size,MPI_INT,&reciver,size,MPI_INT,0,MPI_COMM_WORLD); 
-    // กระจาย value ไปให้แต่ละโปรเซส
+    // กระจาย value ไปให้แต่ละโปรเซส โดยที่ value ที่ให้จะไม่ซ้ำกัน
     MPI_Reduce ( &reciver, &min, size, MPI_INT,MPI_MIN, 0,MPI_COMM_WORLD ); 
     // ใช้ Reduce() หาค่าน้อยที่สุดจาก reciver
     MPI_Reduce ( &reciver, &max, size, MPI_INT,MPI_MAX, 0,MPI_COMM_WORLD ); 
