@@ -1,0 +1,9 @@
+Rank: 0, sum = 3229
+Rank: 2, sum = 5149
+Rank: 4, sum = 3355
+Rank: 6, sum = 3963
+Rank: 7, sum = 3471
+Rank: 3, sum = 3235
+Rank: 1, sum = 2979
+Rank: 5, sum = 4576
+Parallel total sum: 29957

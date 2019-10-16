@@ -209,7 +209,7 @@ int main(int argc,char *argv[]) {
     }
     MPI_Bcast(&input, 1, MPI_INT, 0, MPI_COMM_WORLD); // Process 0 must Bcast to all process
     MPI_Scatter(A,total_size/numprocs,MPI_INT,&reciver,chunk_size,MPI_INT,0,MPI_COMM_WORLD); 
-    // Use Scatter for separate processes to all process
+    // Use Scatter for separate data to all process
 
     for(i=0;i<total_size/numprocs;i++) // use for loop for increment value
     {
@@ -224,6 +224,115 @@ int main(int argc,char *argv[]) {
    {
        printf("Total number that less than %d is %d\n",input,abc);
    }
+    MPI_Finalize();
+}
+```
+
+### 3. Sum 2 arrays value into new array
+
+Given arrays of integers A[100] and B[100], write an MPI program to construct C[100],  which each element C[i] = A[i] + B[i], using MPI_Scatter and MPI_Gather on 2 processes.
+
+เราจะต้องสร้างอาเรย์ 3 อาเรย์ โดยให้อาเรย์แรกบวกค่ากับอาเรย์ที่สองและให้ผลลัพธ์ออกมาเป็นอาเรย์ที่ 3 โดยใช้ MPI_Scatter และ MPI_Gather สองโปรเซส
+
+```C
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <mpi.h>
+
+int main(int argc, char *argv[]) 
+{ 
+    int A[100];
+    int local_A[25];
+    int B[100];
+    int local_B[25];
+    int C[100];
+    int local_C[25];
+    int i;
+    int chunk_size;
+    int rank, size;
+
+    MPI_Status status;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    chunk_size = 100 / size;
+    if(rank == 0) // ถ้าโปรเซสตัวนี้เป็นตัวแรก หรือ โปรเซส 0
+    { 
+        srand(1234);
+        for(i=0; i<100; i++)
+        {
+            A[i] = rand()%1000; // สุ่มค่าให้กับอาเรย์ตัวแรก
+            B[i] = rand()%1000; // สุ่มค่าให้กับอาเรย์ตัวที่สอง
+        }
+    }
+
+    MPI_Scatter(A, chunk_size, MPI_INT, local_A, chunk_size, MPI_INT, 0, MPI_COMM_WORLD); // ใช้ MPI_Scatter ในการกระจายข้อมูลให้กับโปรเซสตัวอื่น
+    MPI_Scatter(B, chunk_size, MPI_INT, local_B, chunk_size, MPI_INT, 0, MPI_COMM_WORLD); // ใช้ MPI_Scatter ในการกระจายข้อมูลให้กับโปรเซสตัวอื่น
+
+    printf("Rank %d, local_A & local_B = A & B[%d to %d]\n", rank, rank*chunk_size, (rank+1)*chunk_size);
+    for(i=0; i<chunk_size; i++)
+    {
+        local_C[i] = local_A[i] + local_B[i];
+    }
+
+    MPI_Gather(local_C, chunk_size, MPI_INT, C, chunk_size, MPI_INT, 0,MPI_COMM_WORLD); // ใช้ MPI_Scatter ในการรวมงานจาก MPI_Scatter
+    if(rank == 0) // ถ้าโปรเซสตัวนี้เป็นตัวที่ 0 หรือ โปรเซสตัวแรก
+    {    		
+		for(i=0;i<100;i++)
+        {
+            printf("%d ", C[i]);
+        }
+    }
+    MPI_Finalize(); // จบการทำงานด้วย MPI
+}
+```
+
+### 4. Calculate random value with array[8][8]
+
+Given a matrix A[8][8] with some random values, write an MPI program to calculate the summation of all elements using only MPI collective communication on 8 processes. (MPI_Send/MPI_Recv are not allowed) 
+
+โจทย์ให้เราสร้าง อาเรย์สองมิติ ที่มีการสุ่มค่าแล้วใช้ฟังก์ชั่นของ MPI ในการคิดค่าทั้งหมด และใช้ MPI_Collective หรือ MPI_Reduce ในการคิดผลรวมของอาเรย์ทั้งหมด(ใช้ 8 โปรเซสในการคำนวณ) โจทย์ไม่ให้เราใช้ MPI_Send และ MPI_Recv
+
+```C
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <mpi.h>
+
+int main(int argc, char *argv[]) { 
+    int A[8][8];
+    int i, j;
+    int chunk_size;
+    int rank, size;
+    int local_sum = 0;
+    int global_sum = 0;
+    MPI_Status status;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    chunk_size = 8 / size; // กำหนด Chunk size เพื่อนำไปคำนวณใน MPI
+    int local[8*chunk_size];
+
+    if(rank == 0){
+        srand(1234);
+        for(i=0; i<8; i++){
+            for(j=0; j<8; j++){
+                A[i][j] = rand()%1000; // ใช้ for loop มาสุ่มค่าให้กับอาเรย์ที่เป็นอาเรย์ 2 มิติ
+            }
+        }
+    }
+    MPI_Scatter(A, 8*chunk_size, MPI_INT, local, 8*chunk_size, MPI_INT, 0, MPI_COMM_WORLD); // แบ่งข้อมูลไปให้แต่ละโปรเซสโดยที่ข้อมูลจะไม่ซ้ำกัน
+
+    for(i=0; i<8*chunk_size; i++){
+        local_sum = local_sum + local[i];
+    }
+    printf("Rank: %d, sum = %d\n", rank, local_sum);
+
+    MPI_Reduce(&local_sum, &global_sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); // รวม data มาใว้ที่โปรเซสเดียวแล้วทำการคำนวนผลลัพธ์
+    if(rank == 0){
+		printf("Parallel total sum: %d\n", global_sum);	
+	}
     MPI_Finalize();
 }
 ```
