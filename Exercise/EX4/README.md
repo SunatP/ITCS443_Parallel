@@ -1,4 +1,4 @@
-# 4. Performance Evaluation
+# Exercise 4. Performance Evaluation
 
 ## 1.Based on the following data decomposition strategy, fill in the table below for n = 100 and p = 7
 
