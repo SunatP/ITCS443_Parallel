@@ -86,9 +86,9 @@ Block Size ที่ โปรเซส 0 มีค่าเป็น 85 - 99 + 
 
 ## 2. Suppose that a parallel program will be executed on 16 processors.
 
-- How much the ideal speedup would achieve?
-- If the program has a 4% serial portion, how much speedup can it achieve based on Amdahl's Law?
-- How much speedup limit the program can expect?
+- 1.How much the ideal speedup would achieve?
+- 2.If the program has a 4% serial portion, how much speedup can it achieve based on Amdahl's Law?
+- 3.How much speedup limit the program can expect?
 
 ข้อแรกตอบ 16 ตัว<br>
 
@@ -153,6 +153,6 @@ p = 8
 
 ## 5. Modify the IntegerSum program to measure the execution time of the program by using the MPI_Wtime(). Compare the parallel execution time with a sequential version and discuss the result.
 
-When run Parallel program, this program is faster than Sequential Program<br> Because, Sequential Program need to wait other process to get job done and send back to root node
+When run Parallel program, this program is faster than Sequential Program <br> Because, Sequential Program need to wait other process to get job done and send back to root node
 
 คำตอบคือ เมื่อเราทำการรันโปรแกรมแบบขนาน(Parallel program)เวลาในการรันจะเร็วกว่าการรันแบบเป็นลำดับ(Sequential program)<br> เพราะว่าการรันโค้ดแบบเป็นลำดับ(Sequential program)นั้นต้องรอตัวโปรเซสอื่นทำงานเสร็จก่อนและส่งข้อมูลกลับไป
