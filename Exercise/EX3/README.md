@@ -38,6 +38,9 @@ int main()
 
 MPI_Scatter คือฟังก์ชันที่ทำงานโดยการกระจายข้อมูลจากโปรเซส root ไปยังโปรเซสทั้งหมด แต่ไม่เหมือนกับ MPI_Bcast ตรงที่ MPI_Bcast จะส่งข้อมูลทั้งหมดไปให้กับทุกโปรเซส แต่ MPI_Scatter จะแบ่งข้อมูลเป็นส่วนๆ และส่งแต่จะส่วนให้กับแต่ละโปรเซส
 
+![MPI](http://pages.tacc.utexas.edu/~eijkhout/pcse/html/graphics/collective_comm.jpg)
+
+
 ```C
 MPI_Scatter(
     const vorank *sendbuf,  // &ตัวที่จะส่ง data
@@ -51,6 +54,7 @@ MPI_Scatter(
 ```
 
 MPI_Bcast คือฟังก์ชันสำหรับกระจายข้อมูลจากโปรเซสหนึ่งไปยังโปรเซสที่เหลือทั้งหมด 
+
 
 ![Bcast](https://mpitutorial.com/tutorials/mpi-scatter-gather-and-allgather/broadcastvsscatter.png)
 ```C
