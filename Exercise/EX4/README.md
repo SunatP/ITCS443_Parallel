@@ -132,11 +132,13 @@ Speedup(p) = 1/f + (1 - f) / p # สูตรที่ 1
 E(p) = Speedup(p) / p
 ```
 คำตอบคือ 7.1797 แต่ต้องปัดขึ้นเป็น 8<br>
+![2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/1.gif)
+![1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/2.gif)
 วิธีคิด
 ```bash
 E(p) = Speedup(p) / p  
 # Speedup(p) หรือ S(p) จะต้องใช้ตามกฏที่ให้มา Amdahl หรือ Gustafson
-E(p) = [ 1 / f + ( 1 - f ) / p ] / p
+E(p) =  1 / (f + ( 1 - f ) / p ) / p
 # แทนค่า
 0.89  = [ 1 / 0.02 + (( 1 - 0.02 ) / p )] / p
 0.89  = [ 1 / 0.02 + (( 0.98 ) / p )] / p # คิดค่าในวงเล็บให้หมด
