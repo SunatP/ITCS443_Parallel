@@ -134,6 +134,18 @@ E(p) = Speedup(p) / p
 คำตอบคือ 7.1797 แต่ต้องปัดขึ้นเป็น 8<br>
 ![2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/1.gif)
 ![1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/2.gif)
+
+![2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn.gif)
+
+![3](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(1).gif)
+
+![4](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(2).gif)
+
+![5](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(3).gif)
+
+![6](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(4).gif)
+
+
 วิธีคิด
 ```bash
 E(p) = Speedup(p) / p  
