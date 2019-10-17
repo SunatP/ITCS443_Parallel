@@ -143,8 +143,11 @@ E(p) = Speedup(p) / p
 
 ![5](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(3).gif)
 
+![5.5](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/5.5.gif)
+
 ![6](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(4).gif)
 
+![7]()
 
 วิธีคิด
 ```bash
