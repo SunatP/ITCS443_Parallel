@@ -147,7 +147,19 @@ E(p) = Speedup(p) / p
 
 ![6](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(4).gif)
 
-![7]()
+![7](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/7.gif)
+
+![8](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(6).gif)
+
+![9](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(7).gif)
+
+![10](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(8).gif)
+
+![11](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(9).gif)
+
+![12](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(10).gif)
+
+![13](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX4/img/CodeCogsEqn(11).gif)
 
 วิธีคิด
 ```bash
