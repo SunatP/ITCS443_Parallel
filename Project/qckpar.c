@@ -268,7 +268,7 @@ int main(int argc, char ** argv)
     //  printf("%d ", fullArr[i]);
     end = MPI_Wtime();
     // printf("Time required was %lf seconds\n", end-start);
-    printf("Average time taken by Parallel Quicksort: %lf seconds\n", end-start);
+    printf("Average time taken by Parallel Quicksort: %f seconds\n", end-start);
     free((void *) fullArr);
     free((void *) sizeArr);
     free((void *) displacement);
@@ -297,10 +297,10 @@ int main(int argc, char ** argv)
 		end = clock();
 
 		// calculate time taken by Non-Optimized QuickSort
-		time1 += (double)(end - begin) / CLOCKS_PER_SEC;
+		time1 = (double)(end - begin) / CLOCKS_PER_SEC;
 
 	}
-  printf("Average time taken by Non-Optimized Quicksort: %f seconds\n",time1/NUM);
+  printf("Average time taken by Sequential Quicksort: %f seconds\n",time1);
   }
   MPI_Finalize();
 

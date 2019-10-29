@@ -204,16 +204,15 @@ int main(int argc,char *argv[])
     int     m ;
     double  t1,t2,t3;
     
-    
 
 
-    //MPI_Status status;
+    MPI_Status status;
     MPI_Init(&argc,&argv);
 
     MPI_Comm_rank(MPI_COMM_WORLD,&MyRank);
 
     MPI_Comm_size(MPI_COMM_WORLD,&npes);
-
+		
     if(MyRank==0)
     {
         printf("Initial Quick Sort with MPI\n");
@@ -248,29 +247,30 @@ int main(int argc,char *argv[])
             // printf("%10d",Array[i-1]);
                 // printf("\t");
         }
+	
+	
         // printf("\n");
-        for(int i = 0; i < NUM; i++)
-	{
-		// generate random input
-		for (int i = 0; i < N; i++)
-			dup[i] = arr[i] = rand() % 10000;
+		
+	// generate random input
+	for (int i = 0; i < N; i++)
+		dup[i] = arr[i] = rand() % 10000;
 
-		// Perform non-optimized Quicksort on arr
-		begin = clock();
-		QuickSort(arr, 0, N-1);
-		end = clock();
+	// Perform non-optimized Quicksort on arr
+	begin = clock();
+	QuickSort(arr, 0, N-1);
+	end = clock();
 
-		// calculate time taken by Non-Optimized QuickSort
-		time1 += (double)(end - begin) / CLOCKS_PER_SEC;
+	// calculate time taken by Non-Optimized QuickSort
+	time1 = (double)(end - begin) / CLOCKS_PER_SEC;
      
 
-		// calculate time taken by optimized QuickSort
-		// time2 += (double)(end - begin) / CLOCKS_PER_SEC;
-	}
-    printf("Average time taken by Parallel Quicksort :%6.3f seconds \n",t3);
-    printf("Average time taken by Non-Optimized Quicksort: %f seconds\n",time1/NUM);
-    }
+	// calculate time taken by optimized QuickSort
+	// time2 += (double)(end - begin) / CLOCKS_PER_SEC;
 
+    printf("Average time taken by Parallel Quicksort :%6.3f seconds \n",t3);
+    printf("Average time taken by Seqential Quicksort: %f seconds\n",time1);
+    }
+	printf("Process %d \n",MyRank);
     MPI_Finalize();
     
     
