@@ -4,10 +4,11 @@
 
 #include "math.h"
 #include <time.h>
-#define N 1000000
+// #define N 1000000
 #define  TRUE 1
 // Number of sorting runs
 #define NUM 4 // We Change from 10 to 4 
+static int N = 10000000;
 /**------------------ Sequential QUICKSORT ---------------------**/
 void swap(int a, int b) 
 { 
@@ -189,7 +190,8 @@ int LogBase2(int num)
 
 int main(int argc,char *argv[])
 {
-    int arr[N], dup[N];
+    
+    //int arr[N], dup[N];
 	
 	// seed for random input
 	srand(time(NULL));
@@ -205,7 +207,7 @@ int main(int argc,char *argv[])
     double  t1,t2,t3;
     
 
-
+    int *arr = (int *)malloc(sizeof(int) * N);
     MPI_Status status;
     MPI_Init(&argc,&argv);
 
@@ -217,16 +219,16 @@ int main(int argc,char *argv[])
     {
         printf("Initial Quick Sort with MPI\n");
         ArraySize=1000000;
-        printf("Array size is allocate for %d values \n ",ArraySize);
-        Array=(int *)malloc(ArraySize*sizeof(int));
+        printf("Array size is allocate for %d values \n ",N);
+        Array=(int *)malloc(N*sizeof(int));
 
         if(Array==0)
             printf("Malloc memory error!");
 
         srand(1432427398);
-        for(i=0;i<ArraySize;i++)
+        for(i=0;i<N;i++)
         {
-            Array[i]=(int)rand()%10000;
+            arr[i]=(int)rand()%10000;
             // printf("%d \n", Array[i]);
         }    
         printf("\n");
@@ -234,26 +236,26 @@ int main(int argc,char *argv[])
     //int arr[ArraySize];
     m=LogBase2(npes);
     // MPI_Scatter(&ArraySize,1,MPI_INT,&arr,1,MPI_INT,0,MPI_COMM_WORLD);
-    MPI_Bcast(&ArraySize,1,MPI_INT,0,MPI_COMM_WORLD);
+    MPI_Bcast((int *)&N,1,MPI_INT,0,MPI_COMM_WORLD);
         t1=MPI_Wtime();
-    PQuickSort(Array,0,ArraySize-1,m,0,MyRank);
+    PQuickSort(arr,0,N-1,m,0,MyRank);
         t2=MPI_Wtime();
-        t3=t2-t1;
+        t3=(double)t2-t1;
 
     if(MyRank==0)
     {
-        for(i=0;i<ArraySize;i++)
-        {
-            // printf("%10d",Array[i-1]);
-                // printf("\t");
-        }
+        // for(i=0;i<ArraySize;i++)
+        // {
+        //     // printf("%10d",Array[i-1]);
+        //         // printf("\t");
+        // }
 	
 	
         // printf("\n");
 		
 	// generate random input
 	for (int i = 0; i < N; i++)
-		dup[i] = arr[i] = rand() % 10000;
+		 arr[i] = rand() % 10000;
 
 	// Perform non-optimized Quicksort on arr
 	begin = clock();
@@ -266,7 +268,7 @@ int main(int argc,char *argv[])
 
 	// calculate time taken by optimized QuickSort
 	// time2 += (double)(end - begin) / CLOCKS_PER_SEC;
-
+    printf("Process %d Receive Result\n",MyRank);
     printf("Average time taken by Parallel Quicksort :%6.3f seconds \n",t3);
     printf("Average time taken by Seqential Quicksort: %f seconds\n",time1);
     }

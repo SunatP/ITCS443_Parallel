@@ -5,11 +5,12 @@
 #include "math.h"
 #include <time.h>
 
-#define N 1000000
+// #define N 1000000
 #define X 10000
 #define  TRUE 1
 // Number of sorting runs
 #define NUM 4 // We Change from 10 to 4 
+static int N = 10000000;
 /**------------------ Sequential QUICKSORT ---------------------**/
 void swapqck(int a, int b) 
 { 
@@ -81,8 +82,11 @@ int main(int argc, char ** argv)
 //   srand(123456 + 10000*rank);
   srand(1432427398);
   int * newArr;
-  int * arr = (int *) malloc(sizeof(int)*N/size);
-  int * recvBuffer = (int *) malloc(sizeof(int)*N/size);
+  int * arr = (int *) malloc(sizeof(int)*N/size *(size - 1));
+  // int * arr = (int *) malloc(sizeof(int)*size *(size-1));
+    // int * arr = (int *) malloc(sizeof(int)*(size - 1));
+  
+  int * recvBuffer = (int *) malloc(sizeof(int)*(N/size )* (size - 1) );
 
   int i, j;
   for(i = 0; i < N/size; i++)
@@ -90,6 +94,8 @@ int main(int argc, char ** argv)
   
   if(rank == 0)
   {
+    printf("Initial Quick Sort with MPI\n");
+    printf("Initial Data with allocate memory %d sizes\n",N);
     start = MPI_Wtime();
     pivot = choosePivot(arr, 0, N/size-1);
     // printf("The pivot is %d\n", pivot);
@@ -263,43 +269,36 @@ int main(int argc, char ** argv)
 
   if(rank == 0)
   {
-    
-//    for(i = 0; i < N; i++)
-    //  printf("%d ", fullArr[i]);
     end = MPI_Wtime();
     // printf("Time required was %lf seconds\n", end-start);
     printf("Average time taken by Parallel Quicksort: %f seconds\n", end-start);
     free((void *) fullArr);
     free((void *) sizeArr);
     free((void *) displacement);
-        
-  
-  }
-  if(rank == 0)
-  {
-    int arr[N], dup[N];
-	
+    // int arr[N], dup[N];
+    int *arr = (int *)malloc(sizeof(int) * N);
 	// seed for random input
-	  srand(time(NULL));
+	  srand(1432427398);
  
 	// to measure time taken by optimized and non-optimized Quicksort 
-	  clock_t begin, end;
+	  clock_t begin, endseq;
 	  double time1 = 0.0, time2 = 0.0;
-    for(int i = 0; i < NUM; i++)
-	{
+
 		// generate random input
 		for (int i = 0; i < N; i++)
-			dup[i] = arr[i] = rand() % 10000;
-
+    {
+      arr[i] = rand() % 10000;
+     // printf("%d ",arr[i]);
+    }
+       
 		// Perform non-optimized Quicksort on arr
 		begin = clock();
 		QuickSort(arr, 0, N-1);
-		end = clock();
+		endseq = clock();
 
 		// calculate time taken by Non-Optimized QuickSort
-		time1 = (double)(end - begin) / CLOCKS_PER_SEC;
+		time1 = (double)(endseq - begin) / CLOCKS_PER_SEC;
 
-	}
   printf("Average time taken by Sequential Quicksort: %f seconds\n",time1);
   }
   MPI_Finalize();
