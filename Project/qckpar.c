@@ -12,62 +12,87 @@
 #define NUM 4 // We Change from 10 to 4 
 static int N = 10000000;
 /**------------------ Sequential QUICKSORT ---------------------**/
-void swapqck(int a, int b) 
-{ 
-    int t = a; 
-    a = b; 
-    b = t; 
-} 
- 
-int Partitionqck (int a[], int low, int high)
+void display(int arr[], int n)
 {
-	// Pick rightmost element as pivot from the array
-	int pivot = a[high];
 
-	// elements less than pivot will be pushed to the left of pIndex
-	// elements more than pivot will be pushed to the right of pIndex
-	// equal elements can go either way
-	int pIndex = low;	
-	
-	// each time we finds an element less than or equal to pivot, pIndex
-	// is incremented and that element would be placed before the pivot. 
-	for (int i = low; i < high; i++)
-	{
-		if (a[i] <= pivot)
-		{
-			swapqck(a[i], a[pIndex]);
-			pIndex++;
-		}
-	}
-	// swap pIndex with Pivot
-	swapqck (a[pIndex], a[high]);
-	
-	// return pIndex (index of pivot element)
-	return pIndex;
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        printf("%d ", arr[i]);
+    }
+
+    printf("\n");
 }
 
-void QuickSort(int a[], int low, int high)
+/*Swap function to swap two values*/
+void swapqck(int *first, int *second)
 {
-	// base condition
-	if(low >= high)
-		return;
 
-	// rearrange the elements across pivot
-	int pivot = Partitionqck(a, low, high);
+    int temp = *first;
+    *first = *second;
+    *second = temp;
+}
 
-	// recur on sub-array containing elements that are less than pivot
-	QuickSort(a, low, pivot - 1);
+/*Partition method which selects a pivot
+  and places each element which is less than the pivot value to its left
+  and the elements greater than the pivot value to its right
+  arr[] --- array to be partitioned
+  lower --- lower index 
+  upper --- upper index
+*/
+int partitionqck(int arr[], int lower, int upper)
+{
 
-	// recur on sub-array containing elements that are more than pivot
-	QuickSort(a, pivot + 1, high);
+    int i = (lower - 1);
+
+    int pivot = arr[upper]; // Selects last element as the pivot value
+
+    int j;
+    for (j = lower; j < upper; j++)
+    {
+
+        if (arr[j] <= pivot)
+        { // if current element is smaller than the pivot
+
+            i++; // increment the index of smaller element
+            swapqck(&arr[i], &arr[j]);
+        }
+    }
+
+    swapqck(&arr[i + 1], &arr[upper]); // places the last element i.e, the pivot to its correct position
+
+    return (i + 1);
+}
+
+/*This is where the sorting of the array takes place
+	arr[] --- Array to be sorted
+	lower --- Starting index
+	upper --- Ending index
+*/
+void QuickSort(int arr[], int lower, int upper)
+{
+
+    if (upper > lower)
+    {
+
+        // partitioning index is returned by the partition method , partition element is at its correct poition
+
+        int partitionIndex = partitionqck(arr, lower, upper);
+
+        // Sorting elements before and after the partition index
+        QuickSort(arr, lower, partitionIndex - 1);
+        QuickSort(arr, partitionIndex + 1, upper);
+    }
 }
 
 /**------------------ Parallel QUICKSORT with MPI ---------------------**/
 
-void quicksort(int *, int, int);
+/**------------------ Recursive Zone ---------------------**/
+void quicksort(int *, int, int); 
 int partition(int *, int, int);
 int choosePivot(int *, int, int);
 void swap(int *, int *);
+/**------------------ Recursive Zone ---------------------**/
 
 int main(int argc, char ** argv)
 {
@@ -75,33 +100,33 @@ int main(int argc, char ** argv)
   double start, end;
   MPI_Status status;
 
-  MPI_Init(&argc, &argv);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Init(&argc, &argv); //  initialize the MPI execution environment
+  MPI_Comm_size(MPI_COMM_WORLD, &size); // Returns the rank of the calling process in the communicator
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank); // determines the number of processes 
 
-//   srand(123456 + 10000*rank);
-  srand(1432427398);
+
+  srand(1432427398); // Seed Random
   int * newArr;
-  int * arr = (int *) malloc(sizeof(int)*N/size *(size - 1));
+  int * arr = (int *) malloc(sizeof(int)*N/size *(size - 1)); 
+  // Create Array to allocate the memory by using N size multiply by sizeof integer
   // int * arr = (int *) malloc(sizeof(int)*size *(size-1));
-    // int * arr = (int *) malloc(sizeof(int)*(size - 1));
+  // int * arr = (int *) malloc(sizeof(int)*(size - 1));
   
   int * recvBuffer = (int *) malloc(sizeof(int)*(N/size )* (size - 1) );
-
+ // Create Buffer to allocate the memory by using N size multiply by sizeof integer
   int i, j;
   for(i = 0; i < N/size; i++)
-    arr[i] = rand()%X;
+    arr[i] = rand()%X; // Mod value with range 0 - 9999
   
-  if(rank == 0)
+  if(rank == 0) // Rank 0 is Master Process
   {
     printf("Initial Quick Sort with MPI\n");
     printf("Initial Data with allocate memory %d sizes\n",N);
-    start = MPI_Wtime();
-    pivot = choosePivot(arr, 0, N/size-1);
-    // printf("The pivot is %d\n", pivot);
+    start = MPI_Wtime(); // MPI_Wtime() is Wall clock time use to stopwatch
+    pivot = choosePivot(arr, 0, N/size-1); // Select value by using choosePivot Function
   }
 
-  MPI_Bcast(&pivot, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&pivot, 1, MPI_INT, 0, MPI_COMM_WORLD); // Broadcast process to slave process
 
   //Assume that the number of processes is a power of 2
 
@@ -120,17 +145,18 @@ int main(int argc, char ** argv)
       }
     }
     // printf("storeIdx = %d in process %d\n", storeIdx, rank);
-//0...7 8...15 16/2 = 8
+// 0...7 8...15 16/2 = 8
 //
-//rank / (size/partner) 
-//0 vs 1
+// rank / (size/partner) 
+// 0 vs 1
 //
-//0..3   4..7   8..11 12..15 16/4 = 4
-//lower upper   lower upper
-//0      1       2     3
+// 0..3   4..7   8..11 12..15 16/4 = 4
+// lower upper   lower upper
+// 0      1       2     3
     int flag = 0;
     MPI_Request request, requestSend;
-    if( (rank / partner) % 2 == 0)
+    // MPI_REQUEST represents a handle on a non-blocking operation to know when the non-blocking operation handled completes
+    if( (rank / partner) % 2 == 0) // if Value is master (0)
     {
 
     //   printf("rank + partner is %d\n", rank + partner);
@@ -146,21 +172,21 @@ int main(int argc, char ** argv)
       {
         MPI_Isend(arr+storeIdx, arrSize - storeIdx, MPI_INT, rank + partner, partner,MPI_COMM_WORLD, &requestSend);
       }
-
+    // MPI_Isend is immediate return value when compare MPI_Send
     //   printf("recvsize is %d in process %d\n", recvSize, rank);
 
-      if(recvSize > 0)
+      if(recvSize > 0) // If recvSize has a value
       {
-        free((void *) recvBuffer);
-        recvBuffer = (int *) malloc(sizeof(int)*recvSize);
+        free((void *) recvBuffer); // Use function Free to release memory
+        recvBuffer = (int *) malloc(sizeof(int)*recvSize); // Allocate Memory for RecvBuffer
 
         MPI_Irecv(recvBuffer, recvSize, MPI_INT, rank + partner, partner,
                          MPI_COMM_WORLD, &request);
-
-        MPI_Wait(&request, &status);
+        // MPI Receive with Immediate return
+        MPI_Wait(&request, &status); //  returns when the operation identified by request is complete
       }
     }
-    else
+    else // If Rank is Slave
     {
       int sendVal = storeIdx;
       recvSize = 0;
@@ -187,11 +213,11 @@ int main(int argc, char ** argv)
       }
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD); // Blocks until all processes in the communicator have reached this routine
     if(recvSize > 0)
     {
-      //Merge arrays
-      if((rank / partner) % 2 == 0) //Keep smaller elements
+      // Merge arrays
+      if((rank / partner) % 2 == 0) // Keep smaller elements
       {
         newArr = (int *) malloc(sizeof(int)*(recvSize+storeIdx));
         for(i = 0; i < storeIdx; i++)
@@ -203,7 +229,7 @@ int main(int argc, char ** argv)
         newArr = NULL;
         arrSize = recvSize+storeIdx;
       }
-      else  //Keep larger elements
+      else  // Keep larger elements
       {
         newArr = (int *) malloc(sizeof(int)*(recvSize+(arrSize-storeIdx)));
         for(j = 0, i = storeIdx; i < arrSize; i++, j++)
@@ -221,14 +247,14 @@ int main(int argc, char ** argv)
       arrSize = 0;
     }
 
-    if(rank % partner == 0)
+    if(rank % partner == 0) // Master Rank (0)
     {
       pivot = choosePivot(arr, 0, arrSize-1);
     
       for(i = 1; i < partner; i++)
         MPI_Send(&pivot, 1, MPI_INT, rank+i, partner+1, MPI_COMM_WORLD);
     }
-    else
+    else // Slave Process
     {
       MPI_Recv(&pivot, 1, MPI_INT, partner*(rank/partner), partner+1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
@@ -247,13 +273,13 @@ int main(int argc, char ** argv)
   }
 
   MPI_Gather(&arrSize, 1, MPI_INT, sizeArr, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
+ // spreading elements from one process to many processes
   if(rank == 0)
   {
     i = 0;
     displacement[0] = 0;
     // printf("displacement[%d] = %d\n", i, displacement[i]);
-    //Perform a scan on sizeArr to determine the displacement of each data location.
+    // Perform a scan on sizeArr to determine the displacement of each data location.
     for(i = 1; i < size; i++)
     {
       displacement[i] = sizeArr[i-1] + displacement[i-1];
@@ -262,7 +288,7 @@ int main(int argc, char ** argv)
   }
 
   MPI_Gatherv(arr, arrSize, MPI_INT, fullArr, sizeArr, displacement, MPI_INT, 0, MPI_COMM_WORLD);
-
+  // MPI_Gatherv allowing a varying count of data from each process, since recvcounts is now an array
   MPI_Barrier(MPI_COMM_WORLD);
   if(arrSize > 0)
     free((void *) arr);
@@ -305,7 +331,7 @@ int main(int argc, char ** argv)
 
   return 0;
 }
-
+/**---------- Quicksort for Parallel ----------**/
 void quicksort(int * arr, int lo, int hi)
 {
   if(lo < hi)

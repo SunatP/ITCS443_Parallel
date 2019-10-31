@@ -10,54 +10,77 @@
 #define NUM 4 // We Change from 10 to 4 
 static int N = 10000000;
 /**------------------ Sequential QUICKSORT ---------------------**/
-void swap(int a, int b) 
-{ 
-    int t = a; 
-    a = b; 
-    b = t; 
-} 
- 
-int Partitionqck (int a[], int low, int high)
+void display(int arr[], int n)
 {
-	// Pick rightmost element as pivot from the array
-	int pivot = a[high];
 
-	// elements less than pivot will be pushed to the left of pIndex
-	// elements more than pivot will be pushed to the right of pIndex
-	// equal elements can go either way
-	int pIndex = low;	
-	
-	// each time we finds an element less than or equal to pivot, pIndex
-	// is incremented and that element would be placed before the pivot. 
-	for (int i = low; i < high; i++)
-	{
-		if (a[i] <= pivot)
-		{
-			swap(a[i], a[pIndex]);
-			pIndex++;
-		}
-	}
-	// swap pIndex with Pivot
-	swap (a[pIndex], a[high]);
-	
-	// return pIndex (index of pivot element)
-	return pIndex;
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        printf("%d ", arr[i]);
+    }
+
+    printf("\n");
 }
 
-void QuickSort(int a[], int low, int high)
+/*Swap function to swap two values*/
+void swap(int *first, int *second)
 {
-	// base condition
-	if(low >= high)
-		return;
 
-	// rearrange the elements across pivot
-	int pivot = Partitionqck(a, low, high);
+    int temp = *first;
+    *first = *second;
+    *second = temp;
+}
 
-	// recur on sub-array containing elements that are less than pivot
-	QuickSort(a, low, pivot - 1);
+/*Partition method which selects a pivot
+  and places each element which is less than the pivot value to its left
+  and the elements greater than the pivot value to its right
+  arr[] --- array to be partitioned
+  lower --- lower index 
+  upper --- upper index
+*/
+int partitionqck(int arr[], int lower, int upper)
+{
 
-	// recur on sub-array containing elements that are more than pivot
-	QuickSort(a, pivot + 1, high);
+    int i = (lower - 1);
+
+    int pivot = arr[upper]; // Selects last element as the pivot value
+
+    int j;
+    for (j = lower; j < upper; j++)
+    {
+
+        if (arr[j] <= pivot)
+        { // if current element is smaller than the pivot
+
+            i++; // increment the index of smaller element
+            swap(&arr[i], &arr[j]);
+        }
+    }
+
+    swap(&arr[i + 1], &arr[upper]); // places the last element i.e, the pivot to its correct position
+
+    return (i + 1);
+}
+
+/*This is where the sorting of the array takes place
+	arr[] --- Array to be sorted
+	lower --- Starting index
+	upper --- Ending index
+*/
+void QuickSort(int arr[], int lower, int upper)
+{
+
+    if (upper > lower)
+    {
+
+        // partitioning index is returned by the partition method , partition element is at its correct poition
+
+        int partitionIndex = partitionqck(arr, lower, upper);
+
+        // Sorting elements before and after the partition index
+        QuickSort(arr, lower, partitionIndex - 1);
+        QuickSort(arr, partitionIndex + 1, upper);
+    }
 }
 
 
@@ -237,10 +260,10 @@ int main(int argc,char *argv[])
     m=LogBase2(npes);
     // MPI_Scatter(&ArraySize,1,MPI_INT,&arr,1,MPI_INT,0,MPI_COMM_WORLD);
     MPI_Bcast((int *)&N,1,MPI_INT,0,MPI_COMM_WORLD);
-        t1=MPI_Wtime();
+    t1=MPI_Wtime();
     PQuickSort(arr,0,N-1,m,0,MyRank);
-        t2=MPI_Wtime();
-        t3=(double)t2-t1;
+    t2=MPI_Wtime();
+    t3=t2-t1;
 
     if(MyRank==0)
     {
