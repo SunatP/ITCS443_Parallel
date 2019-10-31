@@ -261,3 +261,14 @@ void QuickSort(int a[], int low, int high)
 ```
 ตามหลักปกติของการ sort เราจะเริ่ม sort โดยการเลือก pivot ก่อนแล้วใช้ฟังก์ชั่น Quicksort (แบบ Recursive) เข้ามาเรียงค่าใหม่
 
+### Result
+
+|Value|Time Used<br> Sequential <br> seconds|Time Used<br> Parrellel (-np 4)<br>seconds|Time Used<br> Parrellel (-np 8)<br> seconds|Time Used<br> Parrellel (-np 16)<br> seconds|
+|:---:|:---:|:---:|:---:|:---:|
+|10|0.000000|0.000167|0.000374|0.007246|
+|100|0.000000|Segmentation fault (11)|0.000636|0.002492|
+|1000|0.000000|Segmentation fault (11)|Segmentation fault (11)|0.008483|
+|10000|0.000000|0.002655|0.001713|0.008657|
+|100000|0.030000|0.023061|0.015439|0.064442|
+|1000000|0.810000|0.322219|0.383939|0.524017|
+|10000000|55.190000|12.533968|10.925307|10.517562|
