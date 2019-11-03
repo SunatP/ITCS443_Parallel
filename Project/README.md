@@ -23,8 +23,9 @@
 ## Algorithm of QuickSort
 
 ![Algorithm](https://i.stack.imgur.com/Z7EIO.png)
+<br>
 หรือ
-
+<br>
 ![2](https://image.slidesharecdn.com/quicksortdiscussionandanalysis-150830134127-lva1-app6891/95/quick-sort-algorithm-discussion-and-analysis-10-638.jpg?cb=1440942157)
 
 อัลกอริทึ่มของ Quick Sort คือ
