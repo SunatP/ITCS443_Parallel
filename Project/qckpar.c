@@ -327,7 +327,7 @@ int N;
   
     // to measure time taken by optimized and non-optimized Quicksort 
       clock_t begin, endseq;
-      double time1 = 0.0, time2 = 0.0;
+      double time1 = 0.0, time2 = 0.0,ratio = 0.0,diff = 0.0;
 
       // generate random input
       for (int i = 0; i < N; i++)
@@ -343,8 +343,11 @@ int N;
 
       // calculate time taken by Non-Optimized QuickSort
       time1 = (double)(endseq - begin) / CLOCKS_PER_SEC;
+      ratio = time1 / (double)(end - start) ;
+      diff = time1 - (end - start);
     printf("Process Used in Sequential : %d \n",rank);
     printf("Average time taken by Sequential Quicksort: %f seconds\n",time1);
+    printf("Difference time is %f seconds (In Parallel Quicksort is %.2f times faster than Sequential)\n",diff,ratio);
     sleep(1.5);
     printf("Quicksort with Sequential and Parallel Finished\n");
     sleep(1.5);
