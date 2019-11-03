@@ -338,7 +338,9 @@ int N;
         
       // Perform non-optimized Quicksort on arr
       begin = clock();
+      // display(arr,N);
       QuickSort(arr, 0, N-1);
+      // display(arr,N);
       endseq = clock();
 
       // calculate time taken by Non-Optimized QuickSort
