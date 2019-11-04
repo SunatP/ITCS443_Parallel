@@ -1,6 +1,6 @@
 # Project Parallel (Quick sort via MPI)
 
-## Due Date : Sunday, November 3, 2019 at Midnight 
+## Due Date : Tuesday, November 5, 2019 at Midnight (11.55 PM) 
 
 ## Demo Date : Wednesday, November 6, 2019 from 1 PM
 
@@ -14,11 +14,12 @@
 
 ### สิ่งที่ต้องเตรียม
 
-1. เน็ตแรงๆ
+1. เน็ตแรงๆ (ไม่งั้นตอนต่อ SSH จะมีอาการกระตุก)
 2. VPN Mahidol
 3. Code Editing สักตัว (VSCODE, Atom ,etc.)
 4. Virtual Box , VMWare (เอามารัน Ubuntu)
 5. GCC และ MPI ไว้สำหรับคอมไพล์ Code 
+6. สวดมนต์ไว้เยอะๆ
 
 ## Algorithm of QuickSort
 
@@ -261,6 +262,10 @@ void QuickSort(int a[], int low, int high)
 }
 ```
 ตามหลักปกติของการ sort เราจะเริ่ม sort โดยการเลือก pivot ก่อนแล้วใช้ฟังก์ชั่น Quicksort (แบบ Recursive) เข้ามาเรียงค่าใหม่
+
+## 
+
+
 
 ### Result
 

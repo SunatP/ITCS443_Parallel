@@ -1,3 +1,12 @@
+/**
+ * Parallel Quicksort via MPI
+ * Coding by Visual Studio Code
+ * Tested by MPI Lab from MUICT and Ubuntu 19.10 based on Virtual Machine
+ * Nutgamol Mahachai 6088061
+ * Poonkasem Kasemsri Na Ayutthaya 6088071
+ * Sunat Praphanwong 6088130
+ * Barameerak Koonmongkon 6088156
+**/
   #include <mpi.h>
   #include <stdio.h>
   #include <stdlib.h>
