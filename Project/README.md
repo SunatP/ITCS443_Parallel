@@ -113,6 +113,11 @@ Now 70 is at its correct place. All elements smaller than
 70 are before it and all elements greater than 70 are after
 it.
 ```
+![qcksort](https://lh6.googleusercontent.com/fk7AoKlReC13QN15YTWs8VZ-habZByAGbK8PIK3k15PkhsAB6sHGkSziUNQgHQ-7uINis6ecow8iQP7hkruxWaOdF2m1RL-pe_HEgEts7CDH_-LfsgqBNmpAIEl4QoqHDEAUtyg)<br>
+
+![qcksort2](https://www.w3resource.com/w3r_images/quick-sort-part-1.png)
+
+
 
 มาดูการเขียนโค้ดแบบ Sequence กันก่อน
 ```c
