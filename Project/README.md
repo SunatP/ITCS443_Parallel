@@ -276,13 +276,17 @@ void QuickSort(int a[], int low, int high)
 
 ```bash
 mpicc -o main main.c -std=c99 # ซึ่ง c99 คือ Flag Compiler บน Ubuntu OS 
+mpicc -o main main.c -std=gnu99
+# c99 stand for  standard version C99
+# old school C -
+# int i; for (i=0; condition ; operation)
+# C99 - for (int i=0; condition ; operation)
 ```
 
 วิธีการรันโค้ด 
 
 ```bash
-mpiexec -np <INT> main <INT> # หรือจะใช้ mpirun ก็ได้
-(ไม่แนะนำ)
+mpiexec -np <INT> main <INT> # หรือจะใช้ mpirun ก็ได้(ไม่แนะนำ)
 mpiexec -np 8 main 100000 # เป็นต้น 
 ```
 
