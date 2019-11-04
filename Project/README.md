@@ -261,10 +261,30 @@ void QuickSort(int a[], int low, int high)
 	QuickSort(a, pivot + 1, high);
 }
 ```
-ตามหลักปกติของการ sort เราจะเริ่ม sort โดยการเลือก pivot ก่อนแล้วใช้ฟังก์ชั่น Quicksort (แบบ Recursive) เข้ามาเรียงค่าใหม่
+ตามหลักปกติของการ **sort** เราจะเริ่ม **sort** โดยการเลือก **pivot** ก่อนแล้วใช้ฟังก์ชั่น Quicksort (แบบ **Recursive**) เข้ามาเรียงค่าใหม่
 
-## 
+## Parallel Coding 
 
+ในส่วนโค้ดของ **Parallel** นั้นเราได้ทำการเขียนฟังก์ชันขึ้นมาใหม่แต่ยังใช้อัลกอริทึ่มเดียวกันกับฝั่งชอง **Sequential** พูดง่ายๆคือ เราแบ่งโค้ดออกมาเป็นสองฝั่ง<br> โดยฝั่งของ Sequential ทำงานที่ **Master Process** หรือ **Rank 0** นั่นเอง<br>
+ฝั่งของ **Parallel** จะยังทำงานตามปกติ โดยแบ่ง NP หรือ Number Processes ไปทำงานโดยการใช้ **MPI_Bcast** เพื่อช่วยในการกระจายงานให้เท่าๆกันทุก Process<br>
+![bcast](https://image.slidesharecdn.com/slides2a-130504060132-phpapp01/95/open-mpi-2-4-638.jpg?cb=1367647332)<br>
+![ex](https://computing.llnl.gov/tutorials/mpi/images/collective_comm.gif)<br>
+
+จากตอนแรกที่เราได้ **Define** ค่าไว้ในโค้ด เราได้ทำการเปลี่ยนจากการ **Define** เป็นการใช้ **atoi(argv[])** แทนเพื่อเพิ่มความสามารถรับค่าจากการ **input** โดยใช้ **Terminal** <br>
+
+**MPI** ที่ใช้นั้นแตกต่างจากปกติแต่ไม่ถึงขั้นแตกต่างกันมากและการคอมไพล์ไฟล์และการรันก็จะแตกต่างจากในสไลด์นิดหน่อย เพราะโค้ดที่ใช้ใน **Parallel** นั้น **For-loop Condition** นั้น ไม่ได้มีการใส่**ปีกกา** หรือ **bracket** ไว้ทำให้เราต้องคอมไพล์โค้ดโดยใช้แบบนี้
+
+```bash
+mpicc -o main main.c -std=c99 # ซึ่ง c99 คือ Flag Compiler บน Ubuntu OS 
+```
+
+วิธีการรันโค้ด 
+
+```bash
+mpiexec -np <INT> main <INT> # หรือจะใช้ mpirun ก็ได้
+(ไม่แนะนำ)
+mpiexec -np 8 main 100000 # เป็นต้น 
+```
 
 
 ### Result
