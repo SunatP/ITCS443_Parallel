@@ -290,12 +290,13 @@ mpicc -o main main.c -std=gnu99
 # C99 - for (int i=0; condition ; operation)
 ```
 
-วิธีการรันโค้ด 
+### วิธีการรันโค้ด 
 
 ```bash
 mpiexec -np <INT> main <INT> # หรือจะใช้ mpirun ก็ได้(ไม่แนะนำ)
 mpiexec -np 8 main 100000 # เป็นต้น 
 ```
+
 
 
 ### Result
