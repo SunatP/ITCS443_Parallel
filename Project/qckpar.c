@@ -115,7 +115,7 @@ int N;
   int main(int argc, char ** argv)
   {
     int rank, size, pivot, partner, recvSize;
-    double start, end;
+    double start, end, starteach, endall;
     MPI_Status status;
 
     MPI_Init(&argc, &argv); //  initialize the MPI execution environment
@@ -136,7 +136,7 @@ int N;
     for(i = 0; i < N/size; i++)
       arr[i] = rand()%X; // Mod value with range 0 - 9999
 
-    
+    starteach = MPI_Wtime();
     if(rank == 0) // Rank 0 is Master Process
     {
       clrscr();
@@ -366,7 +366,12 @@ int N;
     fflush(stdout);
     getchar();
     }
-    if(rank!= 0){printf("Process Used in Parallel : %d \n",rank);}
+    endall = MPI_Wtime();
+    if(rank!= 0)
+    {
+      
+      printf("Process Used in Parallel : %d and used time is : %f \n",rank, (endall - starteach) - 7.0);
+    }
     MPI_Finalize();
 
     return 0;
