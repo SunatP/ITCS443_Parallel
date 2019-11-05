@@ -357,8 +357,8 @@ int N;
       ratio = time1 / (double)(end - start) ;
       diff = time1 - (end - start);
     printf("Process Used in Sequential : %d \n",rank);
-    printf("Average time taken by Sequential Quicksort: %f seconds\n",time1);
-    printf("Difference time is %f seconds (In Parallel Quicksort is %.2f times faster than Sequential)\n",diff,ratio);
+    printf("Average time taken by Sequential Quicksort: %f second(s)\n",time1);
+    printf("Difference time is %f second(s) (In Parallel Quicksort is %.2f time(s) faster than Sequential)\n",diff,ratio);
     sleep(1.5);
     printf("Quicksort with Sequential and Parallel Finished\n");
     sleep(1.5);
@@ -370,7 +370,7 @@ int N;
     if(rank!= 0)
     {
       
-      printf("Process Used in Parallel : %d and used time is : %f \n",rank, (endall - starteach) - 7.0);
+      printf("Process Used in Parallel : %d and used time is : %f second(s)\n",rank, (endall - starteach) - 7.0);
     }
     MPI_Finalize();
 
