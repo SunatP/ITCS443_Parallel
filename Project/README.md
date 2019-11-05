@@ -227,7 +227,7 @@ int Partitionqck (int a[], int low, int high)
 	// elements less than pivot will be pushed to the left of pIndex
 	// elements more than pivot will be pushed to the right of pIndex
 	// equal elements can go either way
-	int pIndex = low;	
+	int pIndex = low;
 	
 	// each time we finds an element less than or equal to pivot, pIndex
 	// is incremented and that element would be placed before the pivot. 
@@ -282,9 +282,11 @@ void QuickSort(int a[], int low, int high)
 ```bash
 mpicc -o main main.c -std=c99 # ซึ่ง c99 คือ Flag Compiler บน Ubuntu OS 
 mpicc -o main main.c -std=gnu99
-# c99 stand for  standard version C99
+# c99 stand for standard version C99
 # old school C -
-# int i; for (i=0; condition ; operation)
+# int i;
+# for (i=0; condition ; operation)
+# 
 # C99 - for (int i=0; condition ; operation)
 ```
 
