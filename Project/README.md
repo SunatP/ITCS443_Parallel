@@ -297,6 +297,30 @@ mpiexec -np <INT> main <INT> # หรือจะใช้ mpirun ก็ได�
 mpiexec -np 8 main 100000 # เป็นต้น 
 ```
 
+### ผลลัพธ์ที่ได้
+```bash
+Initial Quick Sort with MPI
+---------- Our Group Member ----------
+ Nutgamol M. 6088061
+ Poonkasem K. 6088071
+ Sunat P. 6088130
+ Barameerak K. 6088156
+---------- Our Group Member ----------
+Initial Data with allocate memory 1000000 sizes
+Process Used in Parallel : 1 and used time is : 0.376826 second(s)
+Process Used in Parallel : 2 and used time is : 0.376490 second(s)
+Process Used in Parallel : 3 and used time is : 0.376563 second(s)
+Process Used in Parallel : 4 and used time is : 0.376715 second(s)
+Process Used in Parallel : 5 and used time is : 0.376686 second(s)
+Process Used in Parallel : 6 and used time is : 0.376705 second(s)
+Process Used in Parallel : 7 and used time is : 0.376774 second(s)
+Average time taken by Parallel Quicksort: 0.374151 seconds
+Process Used in Sequential : 0
+Average time taken by Sequential Quicksort: 0.710000 second(s)
+Difference time is 0.335849 second(s) (In Parallel Quicksort is 1.90 time(s) faster than Sequential)
+Quicksort with Sequential and Parallel Finished
+Press Enter to Exit...
+```
 
 
 ### Result

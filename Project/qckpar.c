@@ -153,15 +153,12 @@ int N;
       pivot = choosePivot(arr, 0, N/size-1); // Select value by using choosePivot Function
     }
 
-
     MPI_Bcast(&pivot, 1, MPI_INT, 0, MPI_COMM_WORLD); // Broadcast process to slave process
-
-    //Assume that the number of processes is a power of 2
 
     int storeIdx = 0;
     int arrSize = N/size;
 
-    for(partner = size/2; partner > 0; partner = partner >> 1)
+    for(partner = size/2; partner > 0; partner = partner >> 1) // >> shift bit right
     {
       storeIdx = 0;
       for(i = 0; i < arrSize; i++)
@@ -194,7 +191,6 @@ int N;
         MPI_Isend(&sendVal, 1, MPI_INT, rank+partner, partner+size, MPI_COMM_WORLD, &requestSend);
         MPI_Irecv(&recvSize, 1, MPI_INT, rank+partner, partner+size, MPI_COMM_WORLD, &request);
         MPI_Wait(&request, &status);
-
 
         if(arrSize-storeIdx > 0)
         {
@@ -234,8 +230,7 @@ int N;
           free((void *) recvBuffer);
           recvBuffer = (int *) malloc(sizeof(int)*recvSize);
 
-          MPI_Irecv(recvBuffer, recvSize, MPI_INT, rank - partner, partner,
-                          MPI_COMM_WORLD, &request);
+          MPI_Irecv(recvBuffer, recvSize, MPI_INT, rank - partner, partner,MPI_COMM_WORLD, &request);
 
           MPI_Wait(&request, &status);
         }
@@ -286,7 +281,6 @@ int N;
       {
         MPI_Recv(&pivot, 1, MPI_INT, partner*(rank/partner), partner+1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       }
-
     }
 
     if(arrSize > 0)
