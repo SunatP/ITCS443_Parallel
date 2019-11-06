@@ -279,6 +279,167 @@ void QuickSort(int a[], int low, int high)
 
 **MPI** ที่ใช้นั้นแตกต่างจากปกติแต่ไม่ถึงขั้นแตกต่างกันมากและการคอมไพล์ไฟล์และการรันก็จะแตกต่างจากในสไลด์นิดหน่อย เพราะโค้ดที่ใช้ใน **Parallel** นั้น **For-loop Condition** นั้น ไม่ได้มีการใส่**ปีกกา** หรือ **bracket** ไว้ทำให้เราต้องคอมไพล์โค้ดโดยใช้แบบนี้
 
+```c
+int rank, size, pivot, partner, recvSize;
+double start, end, starteach, endall;
+MPI_Status status;
+MPI_Init(&argc, &argv); //  initialize the MPI execution environment
+N = atoi(argv[1]);
+MPI_Comm_size(MPI_COMM_WORLD, &size); // Returns the rank of the calling process in the communicator
+MPI_Comm_rank(MPI_COMM_WORLD, &rank); // determines the number of processes 
+
+srand(1432427398); // Seed Random
+int * newArr;
+int * arr = (int *) malloc(sizeof(int)*N/size *(size - 1)); 
+// Create Array to allocate the memory by using N size multiply by sizeof integer
+int * recvBuffer = (int *) malloc(sizeof(int)*(N/size )* (size - 1) );
+  // Create Buffer to allocate the memory by using N size multiply by sizeof integer
+int i, j;
+for(i = 0; i < N/size; i++)
+    arr[i] = rand()%X; // Mod value with range 0 - 9999
+if(rank == 0) // Rank 0 is Master Process
+{
+    clrscr();
+    printf("Initial Quick Sort with MPI\n");
+	sleep(3);
+    fflush(stdout);
+    printf("---------- Our Group Member ----------\n");
+    printf(" Nutgamol M. 6088061 \n Poonkasem K. 6088071 \n Sunat P. 6088130 \n Barameerak K. 6088156\n");
+    printf("---------- Our Group Member ----------\n");
+	sleep(3);
+    printf("Initial Data with allocate memory %d sizes\n",N);
+    sleep(1.5);
+    start = MPI_Wtime(); // MPI_Wtime() is Wall clock time use to stopwatch
+    pivot = choosePivot(arr, 0, N/size-1); // Select value by using choosePivot Function
+}
+```
+ตรงนี้เราจะให้ Master เริ่มเลือกค่าโดยใช้ฟังก์ชั่น choosePivot จาก for-loop ที่สุ่มค่าตั้งแต่ 0-9999 เป็นจำนวน N ตัว
+<br>
+
+```c
+MPI_Bcast(&pivot, 1, MPI_INT, 0, MPI_COMM_WORLD); // Broadcast process to slave process
+```
+
+จากนั้นใช้ Bcast ประกาศให้ทุกโปรเซสรับ Data ไปให้ Processes ทุกตัวรับรู้ก่อน<br>
+
+```c
+ 	int storeIdx = 0;
+    int arrSize = N/size;
+
+    for(partner = size/2; partner > 0; partner = partner >> 1) // >> shift bit right
+    {
+      storeIdx = 0;
+      for(i = 0; i < arrSize; i++)
+      {
+        if(arr[i] < pivot)
+        {
+          swap(&arr[i], &arr[storeIdx]);
+          storeIdx++;
+        }
+      }
+
+      int flag = 0;
+      MPI_Request request, requestSend;
+      // MPI_REQUEST represents a handle on a non-blocking operation to know when the non-blocking operation handled completes
+      if( (rank / partner) % 2 == 0) // if Value is master (0)
+      {
+
+        int sendVal = arrSize-storeIdx;
+        recvSize = 0;
+        MPI_Isend(&sendVal, 1, MPI_INT, rank+partner, partner+size, MPI_COMM_WORLD, &requestSend);
+        MPI_Irecv(&recvSize, 1, MPI_INT, rank+partner, partner+size, MPI_COMM_WORLD, &request);
+        MPI_Wait(&request, &status);
+
+        if(arrSize-storeIdx > 0)
+        {
+          MPI_Isend(arr+storeIdx, arrSize - storeIdx, MPI_INT, rank + partner, partner,MPI_COMM_WORLD, &requestSend);
+        }
+      // MPI_Isend is immediate return value when compare MPI_Send
+
+        if(recvSize > 0) // If recvSize has a value
+        {
+          free((void *) recvBuffer); // Use function Free to release memory
+          recvBuffer = (int *) malloc(sizeof(int)*recvSize); // Allocate Memory for RecvBuffer
+
+          MPI_Irecv(recvBuffer, recvSize, MPI_INT, rank + partner, partner,
+                          MPI_COMM_WORLD, &request);
+          // MPI Receive with Immediate return
+          MPI_Wait(&request, &status); //  returns when the operation identified by request is complete
+        }
+      }
+      else // If Rank is Slave
+      {
+        int sendVal = storeIdx;
+        recvSize = 0;
+        MPI_Isend(&sendVal, 1, MPI_INT, rank-partner, partner+size, MPI_COMM_WORLD, &requestSend);
+        MPI_Irecv(&recvSize, 1, MPI_INT, rank-partner, partner+size, MPI_COMM_WORLD, &request);
+        MPI_Wait(&request, &status);
+
+        if(storeIdx > 0)
+        {
+          MPI_Isend(arr, storeIdx, MPI_INT, rank - partner, partner, MPI_COMM_WORLD, &requestSend);
+        }
+
+        if(recvSize > 0)
+        {
+          free((void *) recvBuffer);
+          recvBuffer = (int *) malloc(sizeof(int)*recvSize);
+
+          MPI_Irecv(recvBuffer, recvSize, MPI_INT, rank - partner, partner,MPI_COMM_WORLD, &request);
+
+          MPI_Wait(&request, &status);
+        }
+      }
+
+      MPI_Barrier(MPI_COMM_WORLD); // Blocks until all processes in the communicator have reached this routine
+      if(recvSize > 0)
+      {
+        // Merge arrays
+        if((rank / partner) % 2 == 0) // Keep smaller elements
+        {
+          newArr = (int *) malloc(sizeof(int)*(recvSize+storeIdx));
+          for(i = 0; i < storeIdx; i++)
+            newArr[i] = arr[i];
+          for(j = 0, i = storeIdx; i < recvSize+storeIdx; i++, j++)
+            newArr[i] = recvBuffer[j];
+          free((void *) arr);
+          arr = newArr;
+          newArr = NULL;
+          arrSize = recvSize+storeIdx;
+        }
+        else  // Keep larger elements
+        {
+          newArr = (int *) malloc(sizeof(int)*(recvSize+(arrSize-storeIdx)));
+          for(j = 0, i = storeIdx; i < arrSize; i++, j++)
+            newArr[j] = arr[i];
+          for(j = 0, i = arrSize-storeIdx; i < recvSize+(arrSize-storeIdx); i++, j++)
+            newArr[i] = recvBuffer[j];
+          free((void *) arr);
+          arr = newArr;
+          newArr = NULL;
+          arrSize = recvSize+(arrSize-storeIdx);
+        }
+      }
+      else
+      {
+        arrSize = 0;
+      }
+
+      if(rank % partner == 0) // Master Rank (0)
+      {
+        pivot = choosePivot(arr, 0, arrSize-1);
+    
+        for(i = 1; i < partner; i++)
+          MPI_Send(&pivot, 1, MPI_INT, rank+i, partner+1, MPI_COMM_WORLD);
+      }
+      else // Slave Process
+      {
+        MPI_Recv(&pivot, 1, MPI_INT, partner*(rank/partner), partner+1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      }
+    }
+```
+
+
 ```bash
 mpicc -o main main.c -std=c99 # ซึ่ง c99 คือ Flag Compiler บน Ubuntu OS 
 mpicc -o main main.c -std=gnu99
