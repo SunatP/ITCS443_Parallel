@@ -53,7 +53,7 @@ int main (int argc, char *argv[])
 }
 ```
 ผลลัพธ์ที่ออกมาจะประมาณนี้
-
+![1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX5/img/1.0.PNG)
 
 vecMultiply<<<1, T>>>(devA); ตรงนี้ใน **Nvidia CUDA** จะเรียกว่า **kernel Launch**  ซึ่งค่า **1** ตรงนี้หมายถึง จำนวนกริดของเธรดบล็อก (Grid number of Thread Blocks) และ ค่า **T** หมายถึง เธรดบล็อกที่มีขนาดเป็น T ตัวในการทำงานแบบคู่ขนาน (thread block has T parallel threads)ถ้าเราจะมองให้เห็นภาพกว่านี้อีกนิ๊ดด
 
@@ -138,7 +138,7 @@ int main (int argc, char *argv[])
 	cudaMalloc( (void**)&devA,size);
 	cudaMemcpy( devA, a, size, cudaMemcpyHostToDevice);
 
-	vecMultiply<<<1, 256>>>(devA); // 1 , 256 mean send each data with total thread 256 threads
+	vecMultiply<<<1, 256>>>(devA); // 1 , 256 mean send each data with total 256 thread blocks
 	printf("Before\n");
 	for (i=0; i< ArraySize; i++)
 	{
@@ -156,3 +156,136 @@ int main (int argc, char *argv[])
 	printf("\n");
 }
 ```
+
+ผลลัพธ์ที่ได้
+![2.1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX5/img/2.1.PNG)
+![2.2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX5/img/2.2.PNG)
+
+### ข้อ 3.
+
+Given two array of integers A and B, each having size 256 elements, write a CUDA program with the following kernel to copy the elements of array A to array B in reverse order using 256 threads. 
+For example, if input array A = {1, 2, 3, ..., 256}, 
+the output array B = {256, ..., 3, 2, 1}. 
+```C++
+__global__ void reverseArray (int *A, int *B)  
+{   
+    /* Code to reverse array is here */ 
+}
+```
+
+โจทย์ข้อนี้เราจะต้องใช้อาเรย์สองตัวแต่ละตัวมีขนาดเก็บข้อมูลได้ 256 ช่อง โดยให้ใช้การเขียนโดย CUDA เพื่อทำการ Copy ค่าจากอาเรย์ A ไปอาเรย์ B โดยค่าที่ Copy นั้นจะต้องเป็นค่าที่กลับกัน จากท้ายสุดมาหน้าสุด (Reversed)
+
+```C++
+#include <stdio.h>
+#define T 256 // As Threads
+
+__global__ void reverseArray(int *A, int *B) 
+{
+	int threadID = threadIdx.x;
+	int Reverse = (T - 1) - threadID; // ตรงนี้เอาไว้ทำ Reverse
+	B[Reverse] = A[threadID]; // ตรงนี้ก็เช่นกัน
+}
+
+int main (int argc, char *argv[])
+{
+	int i;
+	int size = T*sizeof(int);
+	int a[T],b[T], *devA,*devB;
+	for (i=0; i< T; i++)
+	{
+		a[i] = i + 1; 	
+	}
+	
+	cudaMalloc( (void**)&devA,size);
+	cudaMalloc( (void**)&devB,size);
+	cudaMemcpy( devA, a, size, cudaMemcpyHostToDevice);
+	cudaMemcpy( devB, b, size, cudaMemcpyHostToDevice);
+	
+	reverseArray<<<1, T>>>(devA,devB); // 1 , T mean send 1 until total 256 thread blocks
+	printf("Before\n");
+	for (i=0; i< T; i++)
+	{
+		printf("%d ", a[i]);	
+	}	
+	printf("\n");
+
+	cudaMemcpy(a, devA, size, cudaMemcpyDeviceToHost);
+	cudaMemcpy(b, devB, size, cudaMemcpyDeviceToHost);
+	cudaFree(devA);
+	cudaFree(devB);
+	printf("After\n");
+	for (i=0; i < T; i++) 
+    {
+		printf("%d ",b[i]);
+	}
+	printf("\n");
+
+}
+```
+ผลลัพธ์ที่ได้
+
+![3.1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX5/img/3.PNG)
+สวยงาม
+
+### ข้อ 4.
+
+Repeat Question 3 with the array A and B, each having 1314 elements, using only 256 threads. 
+ก็เหมือนเดิมเพิ่มเติมคือกำหนดขนาดไว้เป็น 1314 และใช้เธรดแค่ 256 ตัวนะจ๊ะ
+
+```C++
+#include <stdio.h>
+
+#define T 256 // As Threads
+#define ArraySize 1314
+
+__global__ void reverseArray(int *A, int *B) 
+{
+	int threadID = threadIdx.x;
+	int start = (threadID * ArraySize) / 256;
+	int end = ( ( (threadID + 1 ) * ArraySize) / 256) - 1;
+	while(end > 0)
+	{
+		B[end] = A[start];
+		end--;
+		start++;
+	}
+}
+int main (int argc, char *argv[])
+{
+	int i;
+	int size = ArraySize*sizeof(int);
+	int a[ArraySize],b[ArraySize], *devA,*devB;
+	for (i=0; i< ArraySize; i++)
+	{
+		a[i] = i + 1; 	
+	}
+	
+	cudaMalloc( (void**)&devA,size);
+	cudaMalloc( (void**)&devB,size);
+	cudaMemcpy( devA, a, size, cudaMemcpyHostToDevice);
+	cudaMemcpy( devB, b, size, cudaMemcpyHostToDevice);
+	
+	reverseArray<<<1, 256>>>(devA,devB); // 1 , 256 mean send each data with total 256 thread blocks
+	printf("Before\n");
+	for (i=0; i< ArraySize; i++)
+	{
+		printf("%d ", a[i]);	
+	}	
+	printf("\n");
+
+	cudaMemcpy(a, devA, size, cudaMemcpyDeviceToHost);
+	cudaMemcpy(b, devB, size, cudaMemcpyDeviceToHost);
+	cudaFree(devA);
+	cudaFree(devB);
+	printf("After\n");
+	for (i=0; i < ArraySize; i++) 
+    {
+		printf("%d ",b[i]);
+	}
+	printf("\n");
+}
+```
+
+ผลลัพธ์ที่ได้
+![4.1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX5/img/4.1.PNG)
+![4.2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX5/img/4.2.PNG)
