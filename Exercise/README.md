@@ -6,3 +6,6 @@
     3.  Collective Communications มี 5 ข้อ
     4.  Performance Evaluation มี 5 ข้อ
     5.  Introduction to CUDA มี 4 ข้อ
+    6.  CUDA Threads
+    7.  Advanced Topics in CUDA
+    8.  Hadoop 
