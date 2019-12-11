@@ -258,7 +258,7 @@ Pos|Neg : + - + - +  -  + -   +  -
 B       : 1 2 3 4 5  6  7 8   9 10
 Result  : 3 1 7 1 11 1 15 1  19  1 
 ```
-ผลลัพธ์ที่ได้
+ผลลัพธ์ที่ได้<br>
 ![3](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX6/img/3.PNG)
 
 
