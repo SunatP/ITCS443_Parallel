@@ -9,9 +9,8 @@ __global__ void vecMultiplyReverse(int *A, int *B)
 	B[Reverse] = A[i];
     
 }
-
-
-int main (int argc, char *argv[]){
+int main (int argc, char *argv[])
+{
 	int i;
 	int size = T*sizeof(int);
     int a[T],b[T], *devA,*devB;
@@ -39,11 +38,12 @@ int main (int argc, char *argv[]){
     cudaFree(devA);
     cudaFree(devB);
 	printf("After\n");
-	for (i=0; i < T; i++) {
+    for (i=0; i < T; i++) 
+    {
 		printf("%d ",b[i]);
 	}
 	printf("\n");
-
+return 0;
 }
 
 

@@ -49,7 +49,7 @@ int main (int argc, char *argv[])
 		printf("%5d ",size[i]);
 	}
 	printf("\n");
-
+return 0;
 }
 
 

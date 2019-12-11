@@ -11,7 +11,8 @@ __global__ void vecMultiply(int *A)
 	A[i] = A[i] * 2;
 }
 
-int main (int argc, char *argv[]){
+int main (int argc, char *argv[])
+{
 	int i;
 	int size = T*sizeof(int);
 	int a[T], *devA;
@@ -21,11 +22,8 @@ int main (int argc, char *argv[]){
 	}
 	
 	cudaMalloc( (void**)&devA,size);
-
 	cudaMemcpy( devA, a, size, cudaMemcpyHostToDevice);
 
-
-	
 	vecMultiply<<<1, T>>>(devA);
 	printf("Before\n");
 	for (i=0; i< T; i++)

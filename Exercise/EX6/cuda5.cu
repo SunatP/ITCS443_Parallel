@@ -3,7 +3,8 @@
 #define N 16
 
 
-__global__ void vecMatrix(int *A, int *B) {
+__global__ void vecMatrixTransposed(int *A, int *B) 
+{
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y+ threadIdx.y;
     int width = gridDim.x * T;
@@ -14,7 +15,8 @@ __global__ void vecMatrix(int *A, int *B) {
 
 }
 
-int main (int argc, char *argv[]){
+int main (int argc, char *argv[])
+{
 	int i,j;
     int size[N*N];
     int A[N][N];
@@ -39,7 +41,7 @@ int main (int argc, char *argv[]){
 
     dim3 dimBlock(T,T);
     dim3 dimGrid((N+ dimBlock.x - 1)/ dimBlock.x ,(N + dimBlock.y - 1) / dimBlock.y);
-    vecMatrix<<<dimGrid,dimBlock>>>(Adefault,B);
+    vecMatrixTransposed<<<dimGrid,dimBlock>>>(Adefault,B);
     cudaMemcpy(size, B, sizearr, cudaMemcpyDeviceToHost);
     cudaFree(Adefault);
     cudaFree(B);
@@ -47,7 +49,8 @@ int main (int argc, char *argv[]){
     printf("Result\n");
     int newline = 0;
 
-	for (i=0; i < N * N; i++) {
+    for (i=0; i < N * N; i++) 
+    {
         newline++;
         printf("%3d ",size[i]);
         if(newline == N)
@@ -57,7 +60,7 @@ int main (int argc, char *argv[]){
         }	
 	}
 	printf("\n");
-
+return 0;
 }
 
 
