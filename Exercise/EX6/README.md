@@ -73,6 +73,7 @@ dim3 gridDim(array_size/T - 1); // เหมือนกันกับ dimGrid
 ```
 
 ![explaindim](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR6cr-c7jAYN32hBTJeJ5TVVJyv9nEhmagV06vSxG6zPqUUDbPo)
+
 ในตัวอย่างคือเส้นกริดขนาด **4096** โดยที่แต่ละ **blockDim** นั้นในตัวอย่างจะแบ่งโดยใส่ **Thread** ลงใน **Block** ทั้งหมด 256 ตัว (0 - 255) ซึ่ง blockIdx.x 1 ตัว นั้นจะมีค่าเท่ากับ thread 256 ตัว ส่วน threadIdx นั้นจะอยู่ใน blockDim ซึ่งก็คือ (0 - 255) ไปจนครบ blockIdx.x (0 - 4095) หรือ gridDim(4096)
 
 ตัวอย่างในโจทย์คือ threadIdx.x ตัวที่ 3 ใน blockIdx.x ที่ 2 นั้น โจทย์ถามหาว่าตัว threadIdx.x ตัวนี้อยู่ตรงไหน
