@@ -66,8 +66,21 @@ __global__ void vecMultiply(int *A)
 **int i = blockIdx.x * blockDim.x + threadIdx.x;**  ตรงนี้จะเป็นการคิดเลขแบบ multiple thread โดยที่ blockIdx คือ **block Index** จะทำหน้าที่เป็นดัชนีเพื่อเก็บค่าที่ต่างกันในอาเรย์ ส่วน **blockDim** คือ **Block Dimension** ทำหน้าที่เป็นตัวบอกตำแหน่งของเธรดในบล็อกนั้นๆ ส่วน **threadIdx** คือ **Thread Index** ทำหน้าที่เก็บค่าดัชนีสำหรับเธรดในแต่ละบล็อก ส่วนตรงนี้
 
 ```C++
-dim3 dimBlock(T,T); //  ก็คือบล็อกในเธรด หรือ ขนาดบล็อกในมิติที่เรากำหนด
+dim3 dimBlock(T,T); //  ก็คือเธรดในบล็อก หรือ ขนาดเธรดในมิติที่เรากำหนด
+dim3 blockDim(T,T); // เหมือนกับ dimBlock นั่นแหละ
 dim3 dimGrid(array_size/T - 1); // เป็นขนาดเส้นกริดของมิติที่เรากำหนด
+dim3 gridDim(array_size/T - 1); // เหมือนกันกับ dimGrid
+```
+
+![explaindim](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR6cr-c7jAYN32hBTJeJ5TVVJyv9nEhmagV06vSxG6zPqUUDbPo)
+ในตัวอย่างคือเส้นกริดขนาด **4096** โดยที่แต่ละ **blockDim** นั้นในตัวอย่างจะแบ่งโดยใส่ **Thread** ลงใน **Block** ทั้งหมด 256 ตัว (0 - 255) ซึ่ง blockIdx.x 1 ตัว นั้นจะมีค่าเท่ากับ thread 256 ตัว ส่วน threadIdx นั้นจะอยู่ใน blockDim ซึ่งก็คือ (0 - 255) ไปจนครบ blockIdx.x (0 - 4095) หรือ gridDim(4096)
+
+ตัวอย่างในโจทย์คือ threadIdx.x ตัวที่ 3 ใน blockIdx.x ที่ 2 นั้น โจทย์ถามหาว่าตัว threadIdx.x ตัวนี้อยู่ตรงไหน
+
+```bash
+    index =  blockIdx.x * blockDim.x + threadId.x
+# ตำแหน่งที่จะหา = ตำแหน่ง block ที่threadโดนไฮไลท์(blockIdx.x) * ตัวเธรดที่อยู่ในบล็อกนั้นทั้งหมด(blockDim.x) + ตำแหน่งเธรดที่โดนไฮไลท์ (threadId.x)
+    index = 2 * 256 + 3 = 515
 ```
 
 **dim3** คือ integer ในรูปแบบเวกเตอร์ (Vector) มาจาก uint3 (unsigned integer3) ไว้สำหรับระบุมิติของอาเรย์ เมื่อเราใช้ dim3 เมื่อไหร่ก็ตาม ค่าที่ยังไม่ได้โดน assign จะถูก assign เป็น 1 เสมอ ส่วนผลลัพธ์ที่ได้นั้นจะเป็นแบบนี้<br>
