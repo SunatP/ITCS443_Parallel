@@ -442,6 +442,10 @@ __global__ void vecMatrix(int *A, int *B)
 
 }
 ```
-
-เราจะแก้จากข้อ 4. โดยการเอา if condition ออกแล้วใส่ for loop เข้าไปแทนเพื่อทำการ Transpose ตัวเมตริกซ์นั่นเอง ผลลัพธ์จะได้แบบนี้ <br>
+จากข้อ 4. โดยการเอา if condition ออกแล้วใส่ for loop เข้าไปแทนเพื่อทำการ Transpose ตัวเมตริกซ์นั่นเอง ผลลัพธ์จะได้แบบนี้ <br>
 ![5](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX6/img/5.PNG)
+<br>
+อะไรคือการ Transpose<br>
+![5.1](https://www.studymite.com/wp-content/uploads/2018/12/transpose.jpg)
+Transpose คือการเปลี่ยนข้อมูลในเมทริกซ์จาก Row เป็น Column หรือ Column เป็น Row ประมาณนี้<br>
+
