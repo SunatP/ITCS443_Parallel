@@ -10,11 +10,12 @@ int main (int argc, char* argv[])
 {
     try
     {
-        cv::Mat src_host = cv::imread("image.png", cv::IMREAD_GRAYSCALE);
+        cv::Mat src_host = cv::imread("image.png", cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
         cv::cuda::GpuMat dst, src;
         src.upload(src_host);
-        cv::cuda::threshold(src, dst, 128.0, 255.0, cv::THRESH_BINARY);
-        cv::Mat result_host(dst);
+        //cv::cuda::threshold(src, dst, 200.0, 255.0, cv::THRESH_BINARY);
+        cuda::cvtColor(src,dst, cv::COLOR_BGR2GRAY);
+	cv::Mat result_host(dst);
 //        cv::imshow("Result", result_host);
   //      cv::waitKey();
     	cv::imwrite("img.png",result_host);
