@@ -65,3 +65,16 @@ int main(int argc, char *argv[]){
   return 0;
 }
 ```
+
+### ข้อ 2. Write a CUDA program. 
+
+  - Create an array of random integers in CPU 
+  - Receive an integer to search from a user
+  - Use CUDA to count the number of occurrences of the integer in the array (Use atomic operation. Note that this exercise ignores synchronization overhead) 
+  - Display the number of occurrences  of the input integer found in the array 
+
+### ข้อ 3. Given a matrix A[16][16], write a CUDA program to find the summation of each row and each column using atomic operation. 
+
+
+
+### ข้อ 4. Write a CUDA program to find min, max and average values from an array of student scores using reduction operation. Assume that the number of students is a power of 2. 
