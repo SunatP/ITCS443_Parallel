@@ -102,6 +102,11 @@ reduce(key,value):
 
 Draw the flow of data from Question 3, i.e. the intermediate data from mappers to reducers, and the reducers’ output. Given that there are 3 mappers and 2 reducers, and each mapper works on each input line
 
+![1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/1.PNG)
+
+Result
+
+![2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/2.PNG)
 ### ข้อ 5.
 
 In a network analysis job, an administrator wants to examine unusual events from a large log file
