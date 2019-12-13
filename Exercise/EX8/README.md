@@ -1,7 +1,7 @@
 # Exercise 8 Hadoop
 
 ## มีกี่ข้อ?
-   3. ข้อเอง
+   5. ข้อเอง
 
 ### ข้อ 1.
 Write map and reduce functions (pseudo code) to find the minimum temperature of each month from the sample input file below. The first column is the datetime in YYYYMMDDhhmm. The second column is Degree Celsius
