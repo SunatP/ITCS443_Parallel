@@ -5,6 +5,7 @@
     2.  Terminal
     3.  Code Editor
     4.  CUDA (nvcc or Nvidia compiler)
+    5.  สไลด์อาจารย์ด้วยก็ดีนะ	
 
 ## GPU คืออะไร?
 
