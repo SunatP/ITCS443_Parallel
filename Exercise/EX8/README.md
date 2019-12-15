@@ -51,6 +51,156 @@ Ecosystem ของ Hadoop
     6. Cascading
     7. etc.  
 
+### ว่ากันด้วย NoSQL (MongDB นะ ไม่ใช่ MangoDB)
+
+MongoDB คือ โปรแกรมช่วยจัดการฐานข้อมูลในรูปแบบ NoSQL (Not only structured query language) ข้อมูลของเราไม่ได้ถูกจัดเก็บในรูปแบบเพียงแค่ SQL หรือรูปแบบที่เราเข้าใจได้ง่ายๆ เป็นตาราง มี row มี column ชัดเจน แต่ยังมีข้อมูลที่เป็นในรูปแบบ ของ “Video”, “Image”, “Voice”, และอื่นๆอีกมากมาย และด้วยปริมาณที่ ข้อมูลต่างๆมีมากขึ้นแบบ Exponential (แบบ f(x) = x^n ) ทำให้การใช้ฐานข้อมูลแบบเดิมๆเป็นไปได้ยากขึ้น
+
+
+วิธีติดตั้งก็แสนจะง่าย
+[โหลดตรงนี้](https://www.mongodb.com/download-center/community)
+
+
+    1.  เราจะเลือกเวอร์ชั่น 4.X for windows 64-Bit (.msi)
+    2.  ดับเบิ้ลคลิกเพื่อติดตั้งตามขั้นตอนไปเลย
+    3.  หลังจากลงเสร็จตัวโปรแกรมจะไปอยู่ที่ C:\Program Files\MongDB
+    4.  สร้างโฟลเดอร์ที่ไหนก็ได้เอาไว้เก็บตัวอย่าง DB (Database) เช่น C:\u6088XXX
+
+วิธีการเรียก MongoDB มาใช้
+    1.  เรียก PowerShell/Command Prompt อะไรก็ได้
+    2.  แล้วใช้คำสั่งนี้เพื่อใช้เป็นที่อยู่ของ Database
+
+```bash
+"C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe" --dbpath "C:\u6088xxx" 
+```
+
+    3.  ตัวโปรแกรมจะสร้างเซิร์ฟเวอร์ที่ใช้พอร์ต 27017 ขึ้นมา (อย่าไปปิดแท็บนี้)
+
+ตัวอย่าง Database
+
+```SQL
+{   "address": {
+    "building": "1007",
+    "coord": [ -73.856077, 40.848447 ],
+    "street": "Morris Park Ave",
+    "zipcode": "10462"   
+},   
+    "borough": "Bronx",
+    "cuisine": "Bakery",
+    "grades": [      
+    { "date": { "$date": 1393804800000 }, "grade": "A", "score": 2 },      
+    { "date": { "$date": 1378857600000 }, "grade": "A", "score": 6 },      
+    { "date": { "$date": 1358985600000 }, "grade": "A", "score": 10 },     
+    { "date": { "$date": 1322006400000 }, "grade": "A", "score": 9 },      { "date": { "$date": 1299715200000 }, "grade": "B", "score": 14 }   
+],   
+"name": "Morris Park Bake Shop",   "restaurant_id": "30075445" 
+}
+```
+
+    4.  เรียก PowerShell/Command Prompt อะไรก็ได้ขึ้นมาอีกอันนึง
+    5.  แล้วใช้คำสั่งนี้ เพื่อนำเข้าไฟล์ Dataset หรือข้อมูลเข้ามา
+
+```bash
+"c:\Program Files\MongoDB\Server\4.0\bin\mongoimport.exe" --db test --collection restaurants --drop --file "%HOMEPATH%\Downloads\primer-dataset.json"
+```
+    6.เมื่อเสร็จแล้วให้ใช้คำสั่งนี้เพื่อรัน MongoDB ขึ้นมา(MongoDB CLI หรือ Command Line)
+
+```bash
+C:\Program Files\MongoDB\Server\4.0\bin\mongo.exe
+```
+
+   7.   ใช้คำสั่ง use test เพื่อสลับไปใช้ Database ที่ชื่อ test (database ตัวนี้จะมีชื่อ restuarant)
+   8.   ใช้คำสั่งนี้ db.restaurants.count() เพื่อนับ query ทั้งหมด
+
+db.restaurants.count() คืออะไร
+
+```sql
+   db.restaurants.count() 
+            ^          ^
+            |          |
+            |          |
+        ชื่อคอลเลคชั่น      ชื่อเมธอด
+    COLLECTION_NAME  METHOD
+```
+
+## Syntax ที่น่าจะต้องจำ(อ่ะนะ)
+
+```sql
+db.mycol.find().pretty() -- pretty() ใช้สำหรับการแสดงผลลัพธ์ให้ดูสวยงาม
+```
+
+พวกเครื่องหมาย Operator จำไว้หน่อยก็ดีนะ
+
+|Operation|Syntax|Example|RDBMS Eqivalent|
+|---|---|---|---|
+|Equality|{key:value} |	db.mycol.find({"by":"tutorials point"}).pretty() |	where by = 'tutorials point'|
+|Less Than|{key:{$lt:value}}|db.mycol.find({"likes":{$lt:50}}).pretty()|where likes < 50|
+|Less Than Equals|{key:{$lte:value}}|db.mycol.find({"likes":{$lte:50}}).pretty()|where likes <= 50
+Greater Than|{key:{$gt:value}}|db.mycol.find({"likes":{$gt:50}}).pretty()|where likes > 50|
+|Greater Than Equals|{key:{$gte:value}}|db.mycol.find({"likes":{$gte:50}}).pretty()|where likes >= 50|
+|Not Equals|{key:{$ne:value}}|db.mycol.find({"likes":{$ne:50}}).pretty()|where likes != 50|
+
+**AND syntax in MongoDB** ใช้ในเมธอด **find()** และก็ต้องใช้ คอมม่า(,) เพื่อใข้สำหรับเงื่อนไขแบบนี้
+```sql
+>db.mycol.find(
+   {
+      $and: [
+         {key1: value1}, {key2:value2}
+      ]
+   }
+).pretty()
+------------------------------------------
+>db.mycol.find(
+    {
+        $and:[
+            {"by":"tutorials point"},{"title": "MongoDB Overview"}]}).pretty() {
+   "_id": ObjectId(7df78ad8902c),
+   "title": "MongoDB Overview", 
+   "description": "MongoDB is no sql database",
+   "by": "tutorials point",
+   "url": "http://www.tutorialspoint.com",
+   "tags": ["mongodb", "database", "NoSQL"],
+   "likes": "100"
+}
+```
+
+**OR syntax in MongoDB** ใช้ในเมธอด **find()** 
+```sql
+>db.mycol.find(
+   {
+      $or: [
+         {key1: value1}, {key2:value2}
+      ]
+   }
+).pretty()
+-----------------------------------
+>db.mycol.find({$or:[{"by":"tutorials point"},{"title": "MongoDB Overview"}]}).pretty()
+{
+   "_id": ObjectId(7df78ad8902c),
+   "title": "MongoDB Overview", 
+   "description": "MongoDB is no sql database",
+   "by": "tutorials point",
+   "url": "http://www.tutorialspoint.com",
+   "tags": ["mongodb", "database", "NoSQL"],
+   "likes": "100"
+}
+```
+
+**Using AND and OR Together**
+
+```sql
+>db.mycol.find({"likes": {$gt:10}, $or: [{"by": "tutorials point"},
+   {"title": "MongoDB Overview"}]}).pretty()
+{
+   "_id": ObjectId(7df78ad8902c),
+   "title": "MongoDB Overview", 
+   "description": "MongoDB is no sql database",
+   "by": "tutorials point",
+   "url": "http://www.tutorialspoint.com",
+   "tags": ["mongodb", "database", "NoSQL"],
+   "likes": "100"
+}
+```
+
 ### ข้อ 1.
 Write map and reduce functions (pseudo code) to find the minimum temperature of each month from the sample input file below. The first column is the datetime in YYYYMMDDhhmm. The second column is Degree Celsius
 
@@ -199,3 +349,133 @@ reduce(key,value):
     end for
     Emit(key,sum);
 ```
+
+### Lab from Section 1
+
+Assignment มี 10 ข้อ
+
+    1.  Display all distinct cuisines
+    2.  Display only restaurant_id, name, and cuisine fields of all restaurants without the _id field 
+    3.  Find restaurants (display only name) in Manhattan (borough field equal “Manhattan”) 
+    4.  Find restaurants (display only name) in Manhattan which has cuisine “Bakery” 
+    5.  Find restaurants (display name and borough) in Manhattan or in Bronx
+    6.  Find restaurants (display name, borough, and cuisine) in Manhattan or in Bronx which has cuisine “Bakery”
+    7.  Find restaurants (display only name) in Bronx sorted by name in descending order
+    8.  Find all restaurants in Bronx with zipcode 10462 
+    9.  Describe what this query returns (in English sentences) 
+
+```sql
+db.restaurants.find( { "grades.score": { $gt: 30 } } )
+```
+
+    10. Describe what this query returns 
+```sql
+db.restaurants.aggregate([   
+     { $match:  {"cuisine": "Pizza"} },
+     { $group: {
+         _id: "$borough", max_score: {$max: { $max: "$grades.score"}}
+    }}
+])
+```
+
+ข้อ 1. Display all distinct cuisines
+
+```sql
+db.restaurants.find({}, {cuisine: 1, _id:0})
+```
+ผลลัพธ์ที่ได้
+
+![lab1]()
+
+ข้อ 2. Display only restaurant_id, name, and cuisine fields of all restaurants without the _id field
+
+```sql
+db.restaurants.find({},{"restaurant_id" : 1,"name":1,"cuisine" :1,"_id":0});
+```
+
+ผลลัพธ์ที่ได้
+![lab2]()
+
+ข้อ 3. Find restaurants (display only name) in Manhattan (borough field equal “Manhattan”)
+
+```sql
+db.restaurants.find( {"borough" :{$in :["Manhattan"]} }, { "name":1,"_id":0 } );
+```
+
+ผลลัพธ์ที่ได้
+
+![lab3]()
+
+ข้อ 4. Find restaurants (display only name) in Manhattan which has cuisine “Bakery”
+
+```sql
+db.restaurants.find( {"borough" :{$in :["Manhattan"]},"cuisine" :{$in :["Bakery"]} }, {"name":1,"_id":0 } );
+```
+
+![lab4]()
+
+ผลลัพธ์ที่ได้
+
+ข้อ 5. Find restaurants (display name and borough) in Manhattan, or in Bronx
+
+```sql
+db.restaurants.find({"borough":{$in:["Manhattan","Bronx"]}},{"name":1,borough:1,"_id":0 } );
+```
+
+ผลลัพธ์ที่ได้
+
+![lab5]()
+
+ข้อ 6. Find restaurants (display name, borough, and cuisine) in Manhattan or in Bronx which has
+cuisine “Bakery”
+
+```sql
+db.restaurants.find( {"borough" :{$in :["Manhattan","Bronx"]},"cuisine" :{$in :["Bakery"]} }, {
+"name":1,"borough":1,"cuisine":1,"_id":0 } );
+```
+
+ผลลัพธ์ที่ได้
+
+![lab6]()
+
+ข้อ 7. Find restaurants (display only name) in Bronx sorted by name in descending order
+
+```sql
+db.restaurants.find( {"borough" :{$in :["Bronx"]} }, { "name":1,"_id":0 } ).sort( {"name":-1} );
+```
+
+ผลลัพธ์ที่ได้
+
+![lab7]()
+
+ข้อ 8. Find all restaurants in Bronx with zip code 10462
+
+```sql
+db.restaurants.find( {"address.zipcode" :{$in :["10462"]}}, { "restaurant_id" : 1,
+"name":1,"address.zipcode":1,"_id":0 } );
+```
+
+![lab8]()
+
+ข้อ 9. Describe what this query returns (in English sentences)
+
+```sql
+db.restaurants.find({ "grades.score": { $gt: 30 } })
+```
+
+คำตอบ $gt (aggregation) used to showing the result the score that’s greater than 30 from selects the documents
+
+
+ข้อ 10. Describe what this query returns
+
+```sql
+db.restaurants.aggregate([
+{ $match: {"cuisine": "Pizza"} },
+{ $group: {
+_id: "$borough", max_score: {$max: { $max: "$grades.score"}}
+}}
+])
+```
+
+คำตอบ Filters the documents that’s only match the cuisine (pizza) by group from _id and max_score by using $max
+as max value
