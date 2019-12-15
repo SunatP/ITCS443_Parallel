@@ -31,17 +31,16 @@ __global__ void rank_sort(int *data, int *result)
         if(( self > data[j]) || (self == data[j]) && (j < i))
         {
           position+=1;
-        }      
+        }
     }
     result[position] = self;
-}   
+}
 
 int main(int argc, char *argv[]){
   int *arr,*data;
   int i;
   int Data[thread],sort[thread];
   int size =  sizeof(int)*thread;
-//   (float *)malloc(blocks*threads_per_block*sizeof(float));
   srand(123);
   printf(" Generate Ok\n");
   for(i = 0; i < thread; i++)
@@ -52,11 +51,10 @@ int main(int argc, char *argv[]){
   printf(" \n Working Ok\n");
   cudaMalloc( (void**) &arr, size);
   cudaMalloc( (void**) &data, size);
-  printf(" Mallock Ok\n");
-  // thrust::sort(arr, arr + size);
+  printf(" Malloc Ok\n");
   cudaMemcpy(arr,Data,size, cudaMemcpyHostToDevice);
   printf(" Copy Ok\n");
-  rank_sort<<<1,thread>>>(arr,data);
+  rank_sort<<<1,thread>>>(arr,data); // ส่งไปทีละค่า และค่า thread ทั้งหมด
   printf(" Function Ok\n");
   cudaMemcpy(sort,data,size,cudaMemcpyDeviceToHost);
   printf(" Copy Back Ok\n");
@@ -74,15 +72,216 @@ int main(int argc, char *argv[]){
 }
 ```
 
+
+
 ### ข้อ 2. Write a CUDA program. 
 
   - Create an array of random integers in CPU 
   - Receive an integer to search from a user
   - Use CUDA to count the number of occurrences of the integer in the array (Use atomic operation. Note that this exercise ignores synchronization overhead) 
   - Display the number of occurrences  of the input integer found in the array 
+  
+1.  อธิบายข้อแรกเราจะต้องสุ่มค่าให้กับอาเรย์จากฝั่ง host(CPU)
+2.  รับค่าที่ต้องการจะหาได้จากผู้ที่เขียนโค้ด/ผู้รันโค้ด
+3.  ใช้ CUDA ในการนับเลขซ้ำในอาเรย์โดยใช้ Atomic operation (การลดรูปฟังก์ชั่น หรือการใช้ลูป โดยใช้เมธอด)
+4.  แสดงผลลัพธ์ตัวเลขที่มีค่าซ้ำออกมาจากอาเรย์
+
+```C++
+#include <stdio.h>
+#include <stdlib.h>
+#define num_thread 64
+#define thread 16
+__global__ void count(int *data,int input, int *result)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(data[i] == input)
+    {
+        int a = 1;
+        atomicAdd(result,a); // atomicAdd หรือ การเพิ่มค่า โดยเพิ่มค่าจาก a ไปที่ result
+        // result += a;
+    }
+}
+
+int main(int argc, char *argv[]){
+  int Data[num_thread], *arr,input,*result;
+  int i;
+  int resultarr[1];
+  int size = sizeof(int)*num_thread;
+  srand(123);
+  cudaSetDevice(0);
+  for(i = 0; i < num_thread; i++)
+  {
+     Data[i] = rand() % 50;
+     printf("%d ",Data[i]);
+  }
+  printf("Input value to find: ");
+  scanf("%d",&input);
+  printf("\n");
+  cudaMalloc( (void**) &arr, size);
+  cudaMalloc( (void**) &result, sizeof(int));
+
+  cudaMemcpy(arr,Data,size, cudaMemcpyHostToDevice);
+  
+  count<<<num_thread/thread,thread>>>(arr,input,result);
+
+  cudaMemcpy(resultarr,result,sizeof(int),cudaMemcpyDeviceToHost);
+  
+  cudaFree(result);  
+  cudaFree(arr);
+
+  printf(" Value %d to search occurrences Data found: %d",input,resultarr[0]);
+
+  printf("\n");
+
+  return 0;
+}
+```
+
+มาดูตรง Kernel
+```C++
+__global__ void count(int *data,int input, int *result)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(data[i] == input)
+    {
+        int a = 1;
+        atomicAdd(result,a); // atomicAdd หรือ การเพิ่มค่า โดยเพิ่มค่าจาก a ไปที่ result
+        // result += a;
+    }
+}
+```
+
+ตรง **Kernel** นี้จะสังเกตว่าเราใช้ **atomicAdd** (Atomic Operation) ในการหาผลลัพธ์ทั้งหมดจากการบวกค่าทั้งหมด 
+
+แล้วอะไรคือ Atomic Operation กันล่ะ?<br> Atomic Operation คือการทำงานด้วยเธรดเดียว (Single Thread) และใช้หน่วยความจำเพียงนิดเดียวเท่านั้น
+
+Atomic Operation มีกี่แบบ?** มี 5 แบบ**
+  1.  Addition/subtraction: atomicAdd, atomicSub
+  2.  Minimum/maximum:  atomicMin, atomicMax
+  3.  Conditional increment/decrement: atomicInc, atomicDec
+  4.  Exchange/compare-and-swap:  atomicExch, atomicCAS
+  5.  More types in Fermi:  atomicAnd, atomicOr, atomicXor
+
+Atomic Operation นั้นเป็นการทำงานแบบที่ต้องใช้**แค่เธรดเดียวเท่านั้น **เธรดอื่นไม่สามารถเข้ามาแก้ไขหรือดูค่าได้** ซึ่ง Atomic Operation นั้นสามารถกัน **Race Condition** หรือที่เรียกว่า**การดึงค่าไปใช้ซ้ำกัน**หรือเรียกการเรียก**พารามิเตอร์ซ้ำซ้อน**<br> **Atomic Operation** สามารถ **อ่าน/แก้ไข** และ **เขียนค่า**ลงไปในหน่วยความจำได้เลยโดยไม่มีการรบกวนจากสิ่งต่างๆที่เกิดขึ้น เช่น **การเรียกใช้ค่านั้นๆ**<br> **Atomic Operation** นั้นในหน่วยความจำแบบใช้ร่วมกัน(**Shared memory**)<br> ส่วนการแบ่งหน่วยความจำให้กับทุกฟังก์ชั่น(**Global memory**) นั้นจะใช้ป้องกันการใช้พารามิเตอร์ระหว่างสองเธรดที่ต่างกัน<br> หลังจากที่ **Kernel call** เรียบร้อยแล้ว ผลลัพธ์จะเท่ากับค่า **input**
 
 ### ข้อ 3. Given a matrix A[16][16], write a CUDA program to find the summation of each row and each column using atomic operation. 
 
+เราจะต้องสร้างเมทริกซ์ที่มีขนาด **16 * 16** **(A[16][16])** โดยใช้ **CUDA** หาผลลัพธ์ของแต่ละแถวและแต่ละหลักโดยใช้ **Atomic Operation**
 
+```C++
+#include <stdio.h>
+#include <stdlib.h>
+#define n 16
+
+__global__ void countNumberInArray(int *originalData, int *arrayCount)
+{    
+    int index = blockIdx.x * blockDim.x + threadIdx.x, i;
+
+    int sum = 0;
+    if(threadIdx.x < n){
+    for(i = 0; i < n; i++)
+    {
+        if(i < n)
+        {
+            sum += originalData[(index * n) + i];
+            // atomicAdd(&arrayCount[index],sum);
+        }
+        else
+        {
+            sum += originalData[(index * n) + index];
+            // atomicAdd(&arrayCount[index],sum);
+        }
+        printf("%3d " ,threadIdx.x);
+    }
+    }
+    else
+    {
+        for(i = 0; i < n; i++)
+        {
+            if(i < n)
+            {
+                sum += originalData[(index * n) + i];
+                // atomicAdd(&arrayCount[index],sum);
+            }
+            else
+            {
+                sum += originalData[(index * n) + index];
+                // atomicAdd(&arrayCount[index],sum);
+            }
+            printf("%3d " ,threadIdx.x);
+        }   
+    }
+
+    atomicAdd(&arrayCount[index],sum);
+}
+
+int main(int argc, char *argv[])
+{
+    int totalCount = 2 * n;
+    int originalData[n][n], count[totalCount];
+    int i, j;
+    int *deviceOriginalData, *deviceArrayCount;
+    int arrayByteSize = (n *n) * sizeof(int);
+    int countArrayByteSize = totalCount * sizeof(int);
+
+    printf("ORIGINAL: \n");
+    for(i = 0; i < n; i++)
+    {
+        for(j = 0; j < n; j++)
+        {
+            originalData[i][j] = 1;
+            printf("%3d ", originalData[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+
+    cudaMalloc((void**) &deviceOriginalData, arrayByteSize);
+    cudaMalloc((void**) &deviceArrayCount, countArrayByteSize);
+    cudaMemcpy(deviceOriginalData, originalData, arrayByteSize, cudaMemcpyHostToDevice);
+    
+    dim3 blockDim(totalCount);
+    countNumberInArray<<<1, blockDim>>>(deviceOriginalData, deviceArrayCount);
+    
+    cudaMemcpy(count, deviceArrayCount, countArrayByteSize, cudaMemcpyDeviceToHost);
+    cudaFree(deviceOriginalData);
+    cudaFree(deviceArrayCount);
+
+    int rowCounts[n], colCounts[n], rowArrayIterator = 0, colArrayIterator = 0;
+    int rowsum = 0;
+    int colsum = 0;
+    int l = 0;
+    for(l = 0; l < totalCount; l++)
+    {
+        if(l < n)
+        {
+            rowCounts[rowArrayIterator++] = count[l]; 
+            rowsum += count[l];
+        } 
+    }
+    for(l = 0; l < totalCount; l++)
+    {
+        if(l < n)
+        {
+            colCounts[colArrayIterator++] = count[l];     
+        }
+        colsum += count[l];
+    }
+    printf("TOTAL COUNT ROW\n");
+    for(l = 0; l < n; l++)
+    {
+        printf("(%d,%3d)", l, rowCounts[l]);
+    }
+    printf("\nSum Row: %d\n" ,rowsum);
+    printf("\n\nTOTAL COUNT COL\n");
+    for(l = 0; l < n; l++)
+    {
+        printf("(%d,%3d)", l, colCounts[l]);
+    }
+    printf("\nSum Col: %d\n" ,colsum);
+    printf("\n");
+    return 0;
+}
+```
 
 ### ข้อ 4. Write a CUDA program to find min, max and average values from an array of student scores using reduction operation. Assume that the number of students is a power of 2. 

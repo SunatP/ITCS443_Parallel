@@ -1,57 +1,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <thrust/sort.h>
-#define thread 512
-__global__ void rank_sort(int *data, int *result)
+#define num_thread 64
+#define thread 16
+__global__ void count(int *data,int input, int *result)
 {
-    int i,j,position;
-    position = 0;
-    i = threadIdx.x;
-    int self = data[i];
-
-    for(j = 0; j < thread; j++)
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(data[i] == input)
     {
-        if(( self > data[j]) || (self == data[j]) && (j < i))
-        {
-          position+=1;
-        }      
+        int a = 1;
+        atomicAdd(result,a);
     }
-    result[position] = self;
 }   
 
 int main(int argc, char *argv[]){
-  int *arr,*data;
+  int Data[num_thread], *arr,input,*result;
   int i;
-  int Data[thread],sort[thread];
-  int size =  sizeof(int)*thread;
-//   (float *)malloc(blocks*threads_per_block*sizeof(float));
-  srand(123);
+  int resultarr[1];
+  int size = sizeof(int)*num_thread;
+  srand(123456846);
   printf(" Generate Ok\n");
-  for(i = 0; i < thread; i++)
+  cudaSetDevice(0);
+  for(i = 0; i < num_thread; i++)
   {
-     Data[i] = rand() % 100;
+     Data[i] = rand() % 50;
      printf("%d ",Data[i]);
   }
   printf(" \n Working Ok\n");
+  printf("Input value to find: ");
+  scanf("%d",&input);
   cudaMalloc( (void**) &arr, size);
-  cudaMalloc( (void**) &data, size);
-  printf(" Mallock Ok\n");
-  // thrust::sort(arr, arr + size);
-  cudaMemcpy(arr,Data,size, cudaMemcpyHostToDevice);
-  printf(" Copy Ok\n");
-  rank_sort<<<1,thread>>>(arr,data);
-  printf(" Function Ok\n");
-  cudaMemcpy(sort,data,size,cudaMemcpyDeviceToHost);
-  printf(" Copy Back Ok\n");
+  cudaMalloc( (void**) &result, sizeof(int));
+  printf(" Malloc Ok\n");
 
-  printf(" Sorted Data \n");
-  for(i = 0 ; i < thread ; i++)
-  {
-    printf("%d ",sort[i]);
-  }
-  printf("\n");
-  printf(" Sorted OK \n");
-  cudaFree(data);  
+  cudaMemcpy(arr,Data,size, cudaMemcpyHostToDevice);
+  
+  printf(" Copy Ok\n");
+  
+  count<<<num_thread/thread,thread>>>(arr,input,result);
+  
+  printf(" Function Ok\n");
+  
+  cudaMemcpy(resultarr,result,sizeof(int),cudaMemcpyDeviceToHost);
+  printf(" Copy Back Ok\n");
+  
+  cudaFree(result);  
   cudaFree(arr);
+  printf(" Value %d to search occurrences Data found: %d",input,resultarr[0]);
+
+  printf("\n");
+
   return 0;
 }

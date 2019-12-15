@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
   printf(" \n Working Ok\n");
   cudaMalloc( (void**) &arr, size);
   cudaMalloc( (void**) &data, size);
-  printf(" Mallock Ok\n");
+  printf(" Malloc Ok\n");
   // thrust::sort(arr, arr + size);
   cudaMemcpy(arr,Data,size, cudaMemcpyHostToDevice);
   printf(" Copy Ok\n");
