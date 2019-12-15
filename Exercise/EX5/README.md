@@ -61,7 +61,7 @@ CPU นั้นจะประกอบไปด้วย core เพียง�
 
 threadIdx.x ตัวที่ 1 หรือ thread 0 (X = 1), threadIdx.x = 1 , threadIdx.y = threadIdx.Z มีค่า 0 
 threadIdx.x ตัวที่ 3 หรือ thread 2 (X = 3), threadIdx.x = 3 , threadIdx.y = threadIdx.Z มีค่า 0 
-ฺblockDim.x = 4, ฺblockDim.y & ฺblockDim.z = 1
+ฺblockDim.x = 4, ฺblockDim.y = 1, blockDim.z = 0 จะมี thread ทั้งหมด 4*1 = 4 เธรด
 ```
 
 มาดูตัวอย่าง **อาเรย์ 2 มิติ** ใน **CUDA**
@@ -87,7 +87,7 @@ threadIdx.x ตัวที่ 3 หรือ thread 2 (X = 3), threadIdx.x = 3 
 threadIdx.x ตัวที่ 1 หรือ thread 0 (threadIdx.x = 1), threadIdx.x = 0 , threadIdx.y = threadIdx.Z มีค่า 0 
 threadIdx.x ตัวที่ 6 หรือ thread 6 (threadIdx.x = 2), threadIdx.y = 1 threadIdx.Z มีค่า 0 
 threadIdx.x ตัวที่ 4 หรือ thread 4 (threadIdx.x = 0), threadIdx.y = 1 threadIdx.Z มีค่า 0 
-ฺblockDim.x = 3, ฺblockDim.y = 3,blockDim.z = 0
+ฺblockDim.x = 3, ฺblockDim.y = 3,blockDim.z = 0 ก็คือมี Thread ทั้งหมด 3*3 = 9 thread
 ```
 
 
