@@ -72,6 +72,9 @@ int main(int argc, char *argv[]){
 }
 ```
 
+ผลลัพธ์ที่ได้
+
+![1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX7/img/1.PNG)
 
 
 ### ข้อ 2. Write a CUDA program. 
@@ -164,6 +167,10 @@ Atomic Operation มีกี่แบบ?** มี 5 แบบ**
 
 Atomic Operation นั้นเป็นการทำงานแบบที่ต้องใช้**แค่เธรดเดียวเท่านั้น **เธรดอื่นไม่สามารถเข้ามาแก้ไขหรือดูค่าได้** ซึ่ง Atomic Operation นั้นสามารถกัน **Race Condition** หรือที่เรียกว่า**การดึงค่าไปใช้ซ้ำกัน**หรือเรียกการเรียก**พารามิเตอร์ซ้ำซ้อน**<br> **Atomic Operation** สามารถ **อ่าน/แก้ไข** และ **เขียนค่า**ลงไปในหน่วยความจำได้เลยโดยไม่มีการรบกวนจากสิ่งต่างๆที่เกิดขึ้น เช่น **การเรียกใช้ค่านั้นๆ**<br> **Atomic Operation** นั้นในหน่วยความจำแบบใช้ร่วมกัน(**Shared memory**)<br> ส่วนการแบ่งหน่วยความจำให้กับทุกฟังก์ชั่น(**Global memory**) นั้นจะใช้ป้องกันการใช้พารามิเตอร์ระหว่างสองเธรดที่ต่างกัน<br> หลังจากที่ **Kernel call** เรียบร้อยแล้ว ผลลัพธ์จะเท่ากับค่า **input**
 
+ผลลัพธ์ที่ได้
+![2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX7/img/2.PNG)
+
+
 ### ข้อ 3. Given a matrix A[16][16], write a CUDA program to find the summation of each row and each column using atomic operation. 
 
 เราจะต้องสร้างเมทริกซ์ที่มีขนาด **16 * 16** **(A[16][16])** โดยใช้ **CUDA** หาผลลัพธ์ของแต่ละแถวและแต่ละหลักโดยใช้ **Atomic Operation**
@@ -174,11 +181,12 @@ Atomic Operation นั้นเป็นการทำงานแบบที
 #define n 16
 
 __global__ void countNumberInArray(int *originalData, int *arrayCount)
-{    
+{
     int index = blockIdx.x * blockDim.x + threadIdx.x, i;
 
     int sum = 0;
-    if(threadIdx.x < n){
+    if(threadIdx.x < n)
+    {
     for(i = 0; i < n; i++)
     {
         if(i < n)
@@ -209,7 +217,7 @@ __global__ void countNumberInArray(int *originalData, int *arrayCount)
                 // atomicAdd(&arrayCount[index],sum);
             }
             printf("%3d " ,threadIdx.x);
-        }   
+        }
     }
 
     atomicAdd(&arrayCount[index],sum);
@@ -263,7 +271,7 @@ int main(int argc, char *argv[])
     {
         if(l < n)
         {
-            colCounts[colArrayIterator++] = count[l];     
+            colCounts[colArrayIterator++] = count[l];
         }
         colsum += count[l];
     }
@@ -283,5 +291,56 @@ int main(int argc, char *argv[])
     return 0;
 }
 ```
+
+มาดูตรง Kernel ก่อน**สำคัญมาก**
+
+```C++
+__global__ void countNumberInArray(int *originalData, int *arrayCount)
+{
+    int index = blockIdx.x * blockDim.x + threadIdx.x, i;
+
+    int sum = 0;
+    if(threadIdx.x < n)
+    {
+    for(i = 0; i < n; i++)
+    {
+        if(i < n)
+        {
+            sum += originalData[(index * n) + i];
+            // atomicAdd(&arrayCount[index],sum);
+        }
+        else
+        {
+            sum += originalData[(index * n) + index];
+            // atomicAdd(&arrayCount[index],sum);
+        }
+        printf("%3d " ,threadIdx.x);
+    }
+    }
+    else
+    {
+        for(i = 0; i < n; i++)
+        {
+            if(i < n)
+            {
+                sum += originalData[(index * n) + i];
+                // atomicAdd(&arrayCount[index],sum);
+            }
+            else
+            {
+                sum += originalData[(index * n) + index];
+                // atomicAdd(&arrayCount[index],sum);
+            }
+            printf("%3d " ,threadIdx.x);
+        }
+    }
+    atomicAdd(&arrayCount[index],sum);
+}
+```
+การที่เราใช้ **if-else condition** นั้นเพื่อทำการแบ่งให้เธรด(thread) ทำงานคนละครึ่ง ซึ่
+
+
+ผลลัพธ์ที่ได้
+![3](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX7/img/3.PNG)
 
 ### ข้อ 4. Write a CUDA program to find min, max and average values from an array of student scores using reduction operation. Assume that the number of students is a power of 2. 

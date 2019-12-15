@@ -5,9 +5,9 @@
 __global__ void countNumberInArray(int *originalData, int *arrayCount)
 {    
     int index = blockIdx.x * blockDim.x + threadIdx.x, i;
-
     int sum = 0;
-    if(threadIdx.x < n){
+    if(threadIdx.x < n)
+    {
     for(i = 0; i < n; i++)
     {
         if(i < n)
@@ -20,9 +20,11 @@ __global__ void countNumberInArray(int *originalData, int *arrayCount)
             sum += originalData[(index * n) + index];
             // atomicAdd(&arrayCount[index],sum);
         }
-        // printf("%3d " ,threadIdx.x);
+        printf("%3d " ,threadIdx.x);
     }
+    printf("\n");
     }
+    
     else
     {
         for(i = 0; i < n; i++)
@@ -37,10 +39,11 @@ __global__ void countNumberInArray(int *originalData, int *arrayCount)
                 sum += originalData[(index * n) + index];
                 // atomicAdd(&arrayCount[index],sum);
             }
-            // printf("%3d " ,threadIdx.x);
-        }   
-    }
+            printf("%3d " ,threadIdx.x);
+        }  
 
+    }
+ 
     atomicAdd(&arrayCount[index],sum);
 }
 
@@ -52,7 +55,7 @@ int main(int argc, char *argv[])
     int *deviceOriginalData, *deviceArrayCount;
     int arrayByteSize = (n *n) * sizeof(int);
     int countArrayByteSize = totalCount * sizeof(int);
-
+    printf("\n"); 
     printf("ORIGINAL: \n");
     for(i = 0; i < n; i++)
     {
@@ -96,7 +99,7 @@ int main(int argc, char *argv[])
         }
         colsum += count[l];
     }
-    printf("TOTAL COUNT ROW\n");
+    printf("\nTOTAL COUNT ROW\n");
     for(l = 0; l < n; l++)
     {
         printf("(%d,%3d)", l, rowCounts[l]);
