@@ -75,7 +75,7 @@ threadIdx.x ตัวที่ 3 หรือ thread 2 (X = 3), threadIdx.x = 3 
 |    ----------  ----------  ----------   |
 |    ----------  ----------  ----------   |
 |    |thread 4|  |thread 5|  |thread 6|   |
-|    |x=0, y=1|  |x=1, y=1|  |x=2, y=2|   |
+|    |x=0, y=1|  |x=1, y=1|  |x=2, y=1|   |
 |    ----------  ----------  ----------   |
 |    ----------  ----------  ----------   |
 |แ | |thread 7|  |thread 8|  |thread 9|   |
@@ -84,9 +84,10 @@ threadIdx.x ตัวที่ 3 หรือ thread 2 (X = 3), threadIdx.x = 3 
 |Y V                        ------> แกน X |
 -------------------------------------------
 
-threadIdx.x ตัวที่ 1 หรือ thread 0 (threadIdx.x = 1), threadIdx.x = 0 , threadIdx.y = threadIdx.Z มีค่า 0 
+threadIdx.x ตัวที่ 1 หรือ thread 1 (threadIdx.x = 1), threadIdx.x = 0 , threadIdx.y = threadIdx.Z มีค่า 0 
 threadIdx.x ตัวที่ 6 หรือ thread 6 (threadIdx.x = 2), threadIdx.y = 1 threadIdx.Z มีค่า 0 
 threadIdx.x ตัวที่ 4 หรือ thread 4 (threadIdx.x = 0), threadIdx.y = 1 threadIdx.Z มีค่า 0 
+threadIdx.x ตัวที่ 9 หรือ thread 9 (threadIdx.x = 2), threadIdx.y = 2 threadIdx.Z มีค่า 0 
 ฺblockDim.x = 3, ฺblockDim.y = 3,blockDim.z = 0 ก็คือมี Thread ทั้งหมด 3*3 = 9 thread
 ```
 
