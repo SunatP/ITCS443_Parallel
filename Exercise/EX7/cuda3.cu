@@ -1,61 +1,43 @@
 #include <stdio.h>
-#include <stdlib.h>
+
 #define n 16
 
 __global__ void countNumberInArray(int *originalData, int *arrayCount)
 {    
-    int index = blockIdx.x * blockDim.x + threadIdx.x, i;
+    int index = threadIdx.x, i;
     int sum = 0;
     if(threadIdx.x < n)
     {
-    for(i = 0; i < n; i++)
-    {
-        if(i < n)
+        for(i = 0; i < n; i++)
         {
             sum += originalData[(index * n) + i];
-            // atomicAdd(&arrayCount[index],sum);
+            printf("%3d " ,threadIdx.x);
         }
-        else
-        {
-            sum += originalData[(index * n) + index];
-            // atomicAdd(&arrayCount[index],sum);
-        }
-        printf("%3d " ,threadIdx.x);
     }
-    printf("\n");
-    }
-    
     else
     {
         for(i = 0; i < n; i++)
         {
-            if(i < n)
-            {
-                sum += originalData[(index * n) + i];
-                // atomicAdd(&arrayCount[index],sum);
-            }
-            else
-            {
-                sum += originalData[(index * n) + index];
-                // atomicAdd(&arrayCount[index],sum);
-            }
+            sum += originalData[(i * n) + index];
             printf("%3d " ,threadIdx.x);
-        }  
-
+        }   
     }
- 
-    atomicAdd(&arrayCount[index],sum);
+    atomicAdd(&arrayCount[index],sum);        
 }
 
 int main(int argc, char *argv[])
 {
+
     int totalCount = 2 * n;
     int originalData[n][n], count[totalCount];
-    int i, j;
+    int i = 0;
+    int j = 0;
+
     int *deviceOriginalData, *deviceArrayCount;
-    int arrayByteSize = (n *n) * sizeof(int);
+
+    int arrayByteSize = (n * n) * sizeof(int);
     int countArrayByteSize = totalCount * sizeof(int);
-    printf("\n"); 
+
     printf("ORIGINAL: \n");
     for(i = 0; i < n; i++)
     {
@@ -87,19 +69,16 @@ int main(int argc, char *argv[])
     {
         if(l < n)
         {
-            rowCounts[rowArrayIterator++] = count[l]; 
+            rowCounts[rowArrayIterator++] = count[l];
             rowsum += count[l];
-        } 
-    }
-    for(l = 0; l < totalCount; l++)
-    {
-        if(l < n)
-        {
-            colCounts[colArrayIterator++] = count[l];     
         }
-        colsum += count[l];
+        else
+        {
+            colCounts[colArrayIterator++] = count[l];
+            colsum += count[l];
+        }
     }
-    printf("\nTOTAL COUNT ROW\n");
+    printf("TOTAL COUNT ROW\n");
     for(l = 0; l < n; l++)
     {
         printf("(%d,%3d)", l, rowCounts[l]);

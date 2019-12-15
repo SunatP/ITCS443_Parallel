@@ -177,59 +177,42 @@ Atomic Operation นั้นเป็นการทำงานแบบที
 
 ```C++
 #include <stdio.h>
-#include <stdlib.h>
+
 #define n 16
 
 __global__ void countNumberInArray(int *originalData, int *arrayCount)
-{
-    int index = blockIdx.x * blockDim.x + threadIdx.x, i;
-
+{    
+    int index = threadIdx.x, i;
     int sum = 0;
     if(threadIdx.x < n)
     {
-    for(i = 0; i < n; i++)
-    {
-        if(i < n)
+        for(i = 0; i < n; i++)
         {
             sum += originalData[(index * n) + i];
-            // atomicAdd(&arrayCount[index],sum);
+            printf("%3d " ,threadIdx.x);
         }
-        else
-        {
-            sum += originalData[(index * n) + index];
-            // atomicAdd(&arrayCount[index],sum);
-        }
-        printf("%3d " ,threadIdx.x);
-    }
     }
     else
     {
         for(i = 0; i < n; i++)
         {
-            if(i < n)
-            {
-                sum += originalData[(index * n) + i];
-                // atomicAdd(&arrayCount[index],sum);
-            }
-            else
-            {
-                sum += originalData[(index * n) + index];
-                // atomicAdd(&arrayCount[index],sum);
-            }
+            sum += originalData[(i * n) + index];
             printf("%3d " ,threadIdx.x);
-        }
+        }   
     }
-
-    atomicAdd(&arrayCount[index],sum);
+    atomicAdd(&arrayCount[index],sum);        
 }
 
 int main(int argc, char *argv[])
 {
     int totalCount = 2 * n;
     int originalData[n][n], count[totalCount];
-    int i, j;
+    int i = 0;
+    int j = 0;
+
     int *deviceOriginalData, *deviceArrayCount;
-    int arrayByteSize = (n *n) * sizeof(int);
+
+    int arrayByteSize = (n * n) * sizeof(int);
     int countArrayByteSize = totalCount * sizeof(int);
 
     printf("ORIGINAL: \n");
@@ -237,7 +220,7 @@ int main(int argc, char *argv[])
     {
         for(j = 0; j < n; j++)
         {
-            originalData[i][j] = 1;
+            originalData[i][j] = i;
             printf("%3d ", originalData[i][j]);
         }
         printf("\n");
@@ -263,17 +246,14 @@ int main(int argc, char *argv[])
     {
         if(l < n)
         {
-            rowCounts[rowArrayIterator++] = count[l]; 
+            rowCounts[rowArrayIterator++] = count[l];
             rowsum += count[l];
-        } 
-    }
-    for(l = 0; l < totalCount; l++)
-    {
-        if(l < n)
+        }
+        else
         {
             colCounts[colArrayIterator++] = count[l];
+            colsum += count[l];
         }
-        colsum += count[l];
     }
     printf("TOTAL COUNT ROW\n");
     for(l = 0; l < n; l++)
@@ -337,8 +317,25 @@ __global__ void countNumberInArray(int *originalData, int *arrayCount)
     atomicAdd(&arrayCount[index],sum);
 }
 ```
-การที่เราใช้ **if-else condition** นั้นเพื่อทำการแบ่งให้เธรด(thread) ทำงานคนละครึ่ง ซึ่
+การที่เราใช้ **if-else condition** นั้นเพื่อทำการแบ่งให้เธรด(thread) ทำงานคนละครึ่งซึ่งจะแบ่งแบบนี้
 
+![3.1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX7/img/3.1.PNG)<br> โดยตัวเลข 0 - 15 (รวมทั้งหมด 16 threads) นั้นคือการทำส่วน แถว (Row) ก่อน ส่วน 16 - 31 (รวมทั้งหมด 16 threads) จะทำส่วนหลัก (Column) ซึ่งค่าแต่ละหลักรวมกันจะเป็นแบบนี้
+
+```bash
+Row[1] = 0 บวกกัน 16 ครั้ง จะได้ 0
+Row[2] = 1 บวกกัน 16 ครั้ง จะได้ 16
+  .
+  .
+  .
+Row[16] = 15 บวกกัน 16 ครั้ง จะได้ 240
+--------------------
+Column[1] = บวกตั้งแต่ 0 ไปจนถึง 15 จะได้ 120 # จะได้ 120 ทุกแถว
+column[2] = บวกตั้งแต่ 0 ไปจนถึง 15 จะได้ 120 # จะได้ 120 ทุกแถว
+  .
+  .
+  .
+column[16] = บวกตั้งแต่ 0 ไปจนถึง 15 จะได้ 120 # จะได้ 120  
+```
 
 ผลลัพธ์ที่ได้
 ![3](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX7/img/3.PNG)
