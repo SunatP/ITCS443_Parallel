@@ -17,51 +17,59 @@ for (i = 0; i < n; i++) /* for each number */
 ```C++
 #include <stdio.h>
 #include <stdlib.h>
-#include <thrust/sort.h> // ตรงนี้เราจะใช้ Header ของ Nvidia เข้ามาช่วย sort
-#define array_size 64 // ขนาดอาเรย์
-#define thread 16 // define ไว้สำหรับ thread
+#include <thrust/sort.h>
+#define thread 512
 __global__ void rank_sort(int *data, int *result)
 {
     int i,j,position;
-    i = blockIdx.x * blockDim.x + threadIdx.x;
+    position = 0;
+    i = threadIdx.x;
     int self = data[i];
-    for(;i < array_size; i++) // เนื่องจากเราassign i ไว้แล้วเลยไม่ต้อง assign ค่าให้มันอีกรอบ
+
+    for(j = 0; j < thread; j++)
     {
-        position = 0;
-    for(j = 0; j < array_size; j++)
         if(( self > data[j]) || (self == data[j]) && (j < i))
-            position+=1;
-    result[position] = self;
+        {
+          position+=1;
+        }      
     }
-} 
+    result[position] = self;
+}   
 
 int main(int argc, char *argv[]){
-  int *arr = (int *) malloc(sizeof(int)*array_size);
+  int *arr,*data;
   int i;
-  int *data = (int *) malloc(sizeof(int)*array_size);
-  int *result = (int *) malloc(sizeof(int)*array_size);
+  int Data[thread],sort[thread];
   int size =  sizeof(int)*thread;
+//   (float *)malloc(blocks*threads_per_block*sizeof(float));
   srand(123);
-  for(i = 0; i < array_size; i++)
+  printf(" Generate Ok\n");
+  for(i = 0; i < thread; i++)
   {
-     arr[i] = rand() % 50;
+     Data[i] = rand() % 100;
+     printf("%d ",Data[i]);
   }
-  cudaMalloc( (void**) &data, thread*array_size);
-  cudaMalloc( (void**) &result, thread*array_size);
-  thrust::sort(arr, arr + size); // ตรงนี้คือ function sort ของ Nvidia สามารถใช้ sort ได้แบบปกติเลย
-  cudaMemcpy(data,arr,size, cudaMemcpyHostToDevice);
-  dim3 dimBlock(thread);
-  dim3 dimGrid(array_size/thread - 1);
-  rank_sort<<<dimGrid,dimBlock>>>(data,result);
-  cudaMemcpy(arr,data,size,cudaMemcpyDeviceToHost);
+  printf(" \n Working Ok\n");
+  cudaMalloc( (void**) &arr, size);
+  cudaMalloc( (void**) &data, size);
+  printf(" Mallock Ok\n");
+  // thrust::sort(arr, arr + size);
+  cudaMemcpy(arr,Data,size, cudaMemcpyHostToDevice);
+  printf(" Copy Ok\n");
+  rank_sort<<<1,thread>>>(arr,data);
+  printf(" Function Ok\n");
+  cudaMemcpy(sort,data,size,cudaMemcpyDeviceToHost);
+  printf(" Copy Back Ok\n");
+
   printf(" Sorted Data \n");
-  for(i = 0 ; i < array_size ; i++)
+  for(i = 0 ; i < thread ; i++)
   {
-    printf("%d ",arr[i]);
+    printf("%d ",sort[i]);
   }
   printf("\n");
+  printf(" Sorted OK \n");
   cudaFree(data);  
-  cudaFree(result);
+  cudaFree(arr);
   return 0;
 }
 ```
