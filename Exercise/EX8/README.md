@@ -386,7 +386,7 @@ db.restaurants.find({}, {cuisine: 1, _id:0})
 ```
 ผลลัพธ์ที่ได้
 
-![lab1]()
+![lab1](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab1.PNG)
 
 ข้อ 2. Display only restaurant_id, name, and cuisine fields of all restaurants without the _id field
 
@@ -395,7 +395,7 @@ db.restaurants.find({},{"restaurant_id" : 1,"name":1,"cuisine" :1,"_id":0});
 ```
 
 ผลลัพธ์ที่ได้
-![lab2]()
+![lab2](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab2.PNG)
 
 ข้อ 3. Find restaurants (display only name) in Manhattan (borough field equal “Manhattan”)
 
@@ -405,7 +405,7 @@ db.restaurants.find( {"borough" :{$in :["Manhattan"]} }, { "name":1,"_id":0 } );
 
 ผลลัพธ์ที่ได้
 
-![lab3]()
+![lab3](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab3.PNG)
 
 ข้อ 4. Find restaurants (display only name) in Manhattan which has cuisine “Bakery”
 
@@ -413,7 +413,7 @@ db.restaurants.find( {"borough" :{$in :["Manhattan"]} }, { "name":1,"_id":0 } );
 db.restaurants.find( {"borough" :{$in :["Manhattan"]},"cuisine" :{$in :["Bakery"]} }, {"name":1,"_id":0 } );
 ```
 
-![lab4]()
+![lab4](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab4.PNG)
 
 ผลลัพธ์ที่ได้
 
@@ -425,7 +425,7 @@ db.restaurants.find({"borough":{$in:["Manhattan","Bronx"]}},{"name":1,borough:1,
 
 ผลลัพธ์ที่ได้
 
-![lab5]()
+![lab5](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab5.PNG)
 
 ข้อ 6. Find restaurants (display name, borough, and cuisine) in Manhattan or in Bronx which has
 cuisine “Bakery”
@@ -437,7 +437,7 @@ db.restaurants.find( {"borough" :{$in :["Manhattan","Bronx"]},"cuisine" :{$in :[
 
 ผลลัพธ์ที่ได้
 
-![lab6]()
+![lab6](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab6.PNG)
 
 ข้อ 7. Find restaurants (display only name) in Bronx sorted by name in descending order
 
@@ -447,7 +447,7 @@ db.restaurants.find( {"borough" :{$in :["Bronx"]} }, { "name":1,"_id":0 } ).sort
 
 ผลลัพธ์ที่ได้
 
-![lab7]()
+![lab7](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab7.PNG)
 
 ข้อ 8. Find all restaurants in Bronx with zip code 10462
 
@@ -456,7 +456,7 @@ db.restaurants.find( {"address.zipcode" :{$in :["10462"]}}, { "restaurant_id" : 
 "name":1,"address.zipcode":1,"_id":0 } );
 ```
 
-![lab8]()
+![lab8](https://raw.githubusercontent.com/SunatP/ITCS443_Parallel/master/Exercise/EX8/img/lab8.PNG)
 
 ข้อ 9. Describe what this query returns (in English sentences)
 
