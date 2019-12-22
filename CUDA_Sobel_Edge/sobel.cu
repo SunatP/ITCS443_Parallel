@@ -11,19 +11,17 @@ int main (int argc, char* argv[])
     try
     {   
         cv::Mat src_host = cv::imread("image.png", cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
+        cv::flip(src_host,src_host,+1);
+        cv::Mat sobelx;
         cv::cuda::GpuMat dst, src;
-        src.upload(src_host);
-        cv::Ptr<cv::cuda::Filter> filterx,filtery,filterxy;
-        // cv::flip(src_host,sobel_dst,+1);
-        // cv::Mat sobelx;
-	    filterx = cv::cuda::createSobelFilter(CV_8UC1,CV_8UC1,1,0);
-        filterx -> apply(src_host,dst);
+	    cv::Sobel(src_host, sobelx, CV_32F,1,0);
+        src.upload(sobelx);
+
         // cv::cuda::Sobel(src, dst, cv::CV_16S,0,1,3,1,0,BORDER_DEFAULT);
-        cv::Mat result_host(dst);
-        dst.download(src_host);
+        cv::Mat result_host(sobelx);
 //        cv::imshow("Result", result_host);
   //      cv::waitKey();
-    	cv::imwrite("imgsobel.png",src_host);
+    	cv::imwrite("imgsobel.png",sobelx);
     }
     catch(const cv::Exception& ex)
     {
